@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="dicecup">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="2.2699E-50 7.034E-19 0.075"
+        rpy="0 0 0" />
+      <mass
+        value="0.13684" />
+      <inertia
+        ixx="0.00042396"
+        ixy="7.5691E-37"
+        ixz="-9.7244E-37"
+        iyy="0.00042396"
+        iyz="-1.8941E-20"
+        izz="0.00011463" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dicecup/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 0.875" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dicecup/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+</robot>

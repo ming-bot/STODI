@@ -1,0 +1,44 @@
+<launch>
+
+  <!-- these are the arguments you can pass this launch file, for example paused:=true -->
+  <arg name="paused" default="false"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="recording" default="false"/>
+  <arg name="debug" default="false"/>
+  <arg name="physics" default="ode"/>
+
+  <!-- We resume the logic in empty_world.launch -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find mirobot_gazebo)/worlds/empty.world" />
+    <arg name="debug" value="$(arg debug)" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="paused" value="true"/> <!-- value="$(arg paused)" -->
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="headless" value="$(arg headless)"/>
+  </include>
+  
+  <!-- Load the URDF into the ROS Parameter Server -->
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find mirobot_urdf_2)/urdf/mirobot_urdf_2rev.xacro'" /> 
+  <param name="dice_description" command="$(find xacro)/xacro --inorder '$(find dice)/urdf/dice.urdf'" /> 
+  <param name="dicecup_description" command="$(find xacro)/xacro --inorder '$(find dicecup)/urdf/dicecup.urdf'" />
+
+  <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
+  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+	args="-urdf -model mirobot -param robot_description -x 0.2 -y 0.2 -z 0.0 -Y -2.356"/> <!-- -J joint2 0.43633 -J joint3 0.34906 -J joint5 -2.2689 -->
+  <node name="dice1" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+    args="-urdf -model dice1 -param dice_description -x 0 -y -0.02 -z 0.15 -Y 0"/>
+    <!-- -x 0 -y -0.02 -z 0 -->
+  <node name="dice2" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+    args="-urdf -model dice2 -param dice_description -x 0 -y -0.02 -z 0.18 -Y 0"/>
+    <!-- -x 0.013 -y 0.0 -z 0 -->
+  <node name="dice3" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+    args="-urdf -model dice3 -param dice_description -x 0 -y -0.02 -z 0.21 -Y 0"/>
+    <!-- -x -0.013 -y 0.01 -z 0 -->
+  <!-- <node name="dicecup" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+    args="-urdf -model dicecup -param dicecup_description -x 0 -y 0 -z 0 -Y 0 -R 0 -P 0 -"/>-->
+
+  <!--node name="mirobot_write_node" pkg="mirobot_urdf_2" type="mirobot_write_node" /-->
+
+</launch>

@@ -1,0 +1,905 @@
+<sdf version='1.7'>
+  <world name='default'>
+    <light name='sun' type='directional'>
+      <cast_shadows>1</cast_shadows>
+      <pose>0 0 10 0 -0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <spot>
+        <inner_angle>0</inner_angle>
+        <outer_angle>0</outer_angle>
+        <falloff>0</falloff>
+      </spot>
+    </light>
+    <model name='ground_plane'>
+      <static>1</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>50</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='visual'>
+          <cast_shadows>0</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <gravity>0 0 -9.8</gravity>
+    <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
+    <atmosphere type='adiabatic'/>
+    <physics type='ode'>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+    <scene>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
+      <shadows>1</shadows>
+    </scene>
+    <wind/>
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>0</latitude_deg>
+      <longitude_deg>0</longitude_deg>
+      <elevation>0</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+    <state world_name='default'>
+      <sim_time>113 54000000</sim_time>
+      <real_time>121 157632056</real_time>
+      <wall_time>1702995185 90279226</wall_time>
+      <iterations>107910</iterations>
+      <model name='dice1'>
+        <pose>0.000219 -0.019481 -0 7.1e-05 2.9e-05 0.05963</pose>
+        <scale>1 1 1</scale>
+        <link name='base_link'>
+          <pose>0.000219 -0.019481 -0 7.1e-05 2.9e-05 0.05963</pose>
+          <velocity>-0 -0 0.00134 0.301781 0.046921 -2.6e-05</velocity>
+          <acceleration>0.658003 -4.23424 2.66478 0.355336 -0.403153 0.011109</acceleration>
+          <wrench>0.002114 -0.013605 0.008562 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='dice2'>
+        <pose>0.013219 0.010519 -2e-06 -0.000233 -0 0.059646</pose>
+        <scale>1 1 1</scale>
+        <link name='base_link'>
+          <pose>0.013219 0.010519 -2e-06 -0.000233 -0 0.059646</pose>
+          <velocity>0 -0 -0.00134 -0.30178 -0.046926 -2.7e-05</velocity>
+          <acceleration>-0.658069 4.23423 -2.66478 -0.353882 0.393792 -0.011007</acceleration>
+          <wrench>-0.002114 0.013605 -0.008562 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='dice3'>
+        <pose>-0.012781 0.010519 -2e-06 -0.000233 -0 0.059641</pose>
+        <scale>1 1 1</scale>
+        <link name='base_link'>
+          <pose>-0.012781 0.010519 -2e-06 -0.000233 -0 0.059641</pose>
+          <velocity>0 -0 -0.00134 -0.301781 -0.046924 -2.7e-05</velocity>
+          <acceleration>-0.658047 4.23423 -2.66478 -0.35437 0.396931 -0.011005</acceleration>
+          <wrench>-0.002114 0.013605 -0.008562 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='dicecup'>
+        <pose>0.074429 -0.114735 0.323031 -1.7e-05 -1.6e-05 0.002324</pose>
+        <scale>1 1 1</scale>
+        <link name='base_link'>
+          <pose>0.074429 -0.114735 0.323031 -1.7e-05 -1.6e-05 0.002324</pose>
+          <velocity>-0.000196 4.4e-05 -0.004464 -0.015688 0.001017 0.006197</velocity>
+          <acceleration>0 0 -9.8 8e-06 0.00013 0</acceleration>
+          <wrench>0 0 -1.18159 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='ground_plane'>
+        <pose>0 0 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose>0 0 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='mirobot'>
+        <pose>0.21 0.21 1e-06 0 0 -2.356</pose>
+        <scale>1 1 1</scale>
+        <link name='Link1'>
+          <pose>0.21 0.21 0.065416 0 -0 -2.19615</pose>
+          <velocity>-0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+        <link name='Link2'>
+          <pose>0.174785 0.19881 0.126978 -1.57079 -0.729394 -2.19615</pose>
+          <velocity>0 0 -0 0 -0 0</velocity>
+          <acceleration>-0 0 -0 0 -0 0</acceleration>
+          <wrench>-0 0 -0 0 -0 0</wrench>
+        </link>
+        <link name='Link3'>
+          <pose>0.119989 0.139055 0.198921 -1.57076 -1.39149 -2.19618</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>-0 -0 -0 0 -0 0</acceleration>
+          <wrench>-0 -0 -0 0 -0 0</wrench>
+        </link>
+        <link name='Link4'>
+          <pose>0.081512 0.032056 0.199411 -3.1412 -1.39149 -2.19654</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>-0 0 -0 0 -0 0</acceleration>
+          <wrench>-0 0 -0 0 -0 0</wrench>
+        </link>
+        <link name='Link5'>
+          <pose>0.054503 -0.023143 0.188404 1.57087 -0 -2.19616</pose>
+          <velocity>0 0 0 -1e-06 0 0</velocity>
+          <acceleration>-0 0 -0 0 -0 0</acceleration>
+          <wrench>-0 0 -0 0 -0 0</wrench>
+        </link>
+        <link name='Link6'>
+          <pose>0.045971 -0.016982 0.172079 6.5e-05 1e-05 -2.35611</pose>
+          <velocity>0 -0 0 -1e-06 0 0</velocity>
+          <acceleration>-0 -0 -0 0 -0 0</acceleration>
+          <wrench>-0 -0 -0 0 -0 0</wrench>
+        </link>
+        <link name='base_link'>
+          <pose>0.21 0.21 1e-06 0 0 -2.356</pose>
+          <velocity>-0 -0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <light name='sun'>
+        <pose>0 0 10 0 -0 0</pose>
+      </light>
+    </state>
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>0.124255 -1.22183 0.630559 -0 0.285797 1.24336</pose>
+        <view_controller>orbit</view_controller>
+        <projection_type>perspective</projection_type>
+      </camera>
+    </gui>
+    <model name='dice1'>
+      <link name='base_link'>
+        <inertial>
+          <pose>-5e-06 -2.6e-05 0.007015 0 -0 0</pose>
+          <mass>0.003213</mass>
+          <inertia>
+            <ixx>1.0478e-07</ixx>
+            <ixy>-3.073e-11</ixy>
+            <ixz>-2.5456e-13</ixz>
+            <iyy>1.0478e-07</iyy>
+            <iyz>2.9881e-11</iyz>
+            <izz>1.0474e-07</izz>
+          </inertia>
+        </inertial>
+        <collision name='base_link_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/home/hp/Proud_hp/src/dice/meshes/base_link.STL</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='base_link_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/home/hp/Proud_hp/src/dice/meshes/base_link.STL</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <pose>0 -0.02 0 0 -0 0</pose>
+    </model>
+    <model name='dicecup'>
+      <link name='base_link'>
+        <inertial>
+          <pose>-0 0 0.084782 0 -0 0</pose>
+          <mass>0.12057</mass>
+          <inertia>
+            <ixx>0.00032335</ixx>
+            <ixy>1.0942e-36</ixy>
+            <ixz>-4.7135e-36</ixz>
+            <iyy>0.00032335</iyy>
+            <iyz>-1.9326e-20</iyz>
+            <izz>0.00010755</izz>
+          </inertia>
+        </inertial>
+        <collision name='base_link_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/home/hp/Proud_hp/src/dicecup/meshes/base_link.STL</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='base_link_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/home/hp/Proud_hp/src/dicecup/meshes/base_link.STL</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <pose>0 0 0 0 -0 0</pose>
+    </model>
+    <model name='dice3'>
+      <link name='base_link'>
+        <inertial>
+          <pose>-5e-06 -2.6e-05 0.007015 0 -0 0</pose>
+          <mass>0.003213</mass>
+          <inertia>
+            <ixx>1.0478e-07</ixx>
+            <ixy>-3.073e-11</ixy>
+            <ixz>-2.5456e-13</ixz>
+            <iyy>1.0478e-07</iyy>
+            <iyz>2.9881e-11</iyz>
+            <izz>1.0474e-07</izz>
+          </inertia>
+        </inertial>
+        <collision name='base_link_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/home/hp/Proud_hp/src/dice/meshes/base_link.STL</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='base_link_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/home/hp/Proud_hp/src/dice/meshes/base_link.STL</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <pose>-0.013 0.01 0 0 -0 0</pose>
+    </model>
+    <model name='dice2'>
+      <link name='base_link'>
+        <inertial>
+          <pose>-5e-06 -2.6e-05 0.007015 0 -0 0</pose>
+          <mass>0.003213</mass>
+          <inertia>
+            <ixx>1.0478e-07</ixx>
+            <ixy>-3.073e-11</ixy>
+            <ixz>-2.5456e-13</ixz>
+            <iyy>1.0478e-07</iyy>
+            <iyz>2.9881e-11</iyz>
+            <izz>1.0474e-07</izz>
+          </inertia>
+        </inertial>
+        <collision name='base_link_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/home/hp/Proud_hp/src/dice/meshes/base_link.STL</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='base_link_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/home/hp/Proud_hp/src/dice/meshes/base_link.STL</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <pose>0.013 0.01 0 0 -0 0</pose>
+    </model>
+    <model name='mirobot'>
+      <joint name='fixed' type='fixed'>
+        <pose relative_to='__model__'>0 0 0 0 -0 0</pose>
+        <parent>world</parent>
+        <child>base_link</child>
+      </joint>
+      <link name='base_link'>
+        <pose relative_to='fixed'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.000726 2.2e-05 0.024268 0 -0 0</pose>
+          <mass>0.01</mass>
+          <inertia>
+            <ixx>10</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>10</iyy>
+            <iyz>0</iyz>
+            <izz>10</izz>
+          </inertia>
+        </inertial>
+        <collision name='base_link_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/home/hp/Proud_hp/src/mirobot_urdf_2/meshes/base_link.STL</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='base_link_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/home/hp/Proud_hp/src/mirobot_urdf_2/meshes/base_link.STL</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='joint1' type='revolute'>
+        <pose relative_to='base_link'>0 0 0.065406 0 -0 0</pose>
+        <parent>base_link</parent>
+        <child>Link1</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-1.7453</lower>
+            <upper>2.7925</upper>
+            <effort>200</effort>
+            <velocity>200</velocity>
+          </limit>
+          <dynamics>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='Link1'>
+        <pose relative_to='joint1'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.011601 0.022341 0.044136 0 -0 0</pose>
+          <mass>0.001</mass>
+          <inertia>
+            <ixx>10</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>10</iyy>
+            <iyz>0</iyz>
+            <izz>10</izz>
+          </inertia>
+        </inertial>
+        <collision name='Link1_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/home/hp/Proud_hp/src/mirobot_urdf_2/meshes/Link1.STL</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='Link1_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/home/hp/Proud_hp/src/mirobot_urdf_2/meshes/Link1.STL</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='joint2' type='revolute'>
+        <pose relative_to='Link1'>0.029687 -0.022 0.061593 -0.001393 -1.57079 -1.56939</pose>
+        <parent>Link1</parent>
+        <child>Link2</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.5235</lower>
+            <upper>1.2217</upper>
+            <effort>200</effort>
+            <velocity>200</velocity>
+          </limit>
+          <dynamics>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='Link2'>
+        <pose relative_to='joint2'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.054694 0.003638 -0.005611 0 -0 0</pose>
+          <mass>0.001</mass>
+          <inertia>
+            <ixx>10</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>10</iyy>
+            <iyz>0</iyz>
+            <izz>10</izz>
+          </inertia>
+        </inertial>
+        <collision name='Link2_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/home/hp/Proud_hp/src/mirobot_urdf_2/meshes/Link2.STL</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='Link2_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/home/hp/Proud_hp/src/mirobot_urdf_2/meshes/Link2.STL</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='joint3' type='revolute'>
+        <pose relative_to='Link2'>0.108 0 -0.009447 0 -0 0</pose>
+        <parent>Link2</parent>
+        <child>Link3</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-2.9671</lower>
+            <upper>1.0472</upper>
+            <effort>200</effort>
+            <velocity>200</velocity>
+          </limit>
+          <dynamics>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='Link3'>
+        <pose relative_to='joint3'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.01 0.00714 0.037517 0 -0 0</pose>
+          <mass>0.001</mass>
+          <inertia>
+            <ixx>10</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>10</iyy>
+            <iyz>0</iyz>
+            <izz>10</izz>
+          </inertia>
+        </inertial>
+        <collision name='Link3_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/home/hp/Proud_hp/src/mirobot_urdf_2/meshes/Link3.STL</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='Link3_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/home/hp/Proud_hp/src/mirobot_urdf_2/meshes/Link3.STL</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='joint4' type='revolute'>
+        <pose relative_to='Link3'>0.020001 0.10743 0.031439 -1.5708 0 0</pose>
+        <parent>Link3</parent>
+        <child>Link4</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-6.1086</lower>
+            <upper>6.1086</upper>
+            <effort>200</effort>
+            <velocity>200</velocity>
+          </limit>
+          <dynamics>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='Link4'>
+        <pose relative_to='joint4'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>-8e-06 0.00438 0.040569 0 -0 0</pose>
+          <mass>0.001</mass>
+          <inertia>
+            <ixx>10</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>10</iyy>
+            <iyz>0</iyz>
+            <izz>10</izz>
+          </inertia>
+        </inertial>
+        <collision name='Link4_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/home/hp/Proud_hp/src/mirobot_urdf_2/meshes/Link4.STL</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='Link4_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/home/hp/Proud_hp/src/mirobot_urdf_2/meshes/Link4.STL</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='joint5' type='revolute'>
+        <pose relative_to='Link4'>0 -0.010414 0.06155 -1.57079 -1.57079 -7e-06</pose>
+        <parent>Link4</parent>
+        <child>Link5</child>
+        <axis>
+          <xyz>0 0 -1</xyz>
+          <limit>
+            <lower>-3.5779</lower>
+            <upper>0.6283</upper>
+            <effort>200</effort>
+            <velocity>200</velocity>
+          </limit>
+          <dynamics>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='Link5'>
+        <pose relative_to='joint5'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.000253 -0.002013 0.010352 0 -0 0</pose>
+          <mass>0.001</mass>
+          <inertia>
+            <ixx>10</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>10</iyy>
+            <iyz>0</iyz>
+            <izz>10</izz>
+          </inertia>
+        </inertial>
+        <collision name='Link5_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/home/hp/Proud_hp/src/mirobot_urdf_2/meshes/Link5.STL</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='Link5_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/home/hp/Proud_hp/src/mirobot_urdf_2/meshes/Link5.STL</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='joint6' type='revolute'>
+        <pose relative_to='Link5'>0 -0.01628 0.010525 -1.5708 0 0</pose>
+        <parent>Link5</parent>
+        <child>Link6</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-6.2832</lower>
+            <upper>6.2832</upper>
+            <effort>200</effort>
+            <velocity>200</velocity>
+          </limit>
+          <dynamics>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='Link6'>
+        <pose relative_to='joint6'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>-0.495887 -0.495887 0.083998 0 -0 0</pose>
+          <mass>0.12157</mass>
+          <inertia>
+            <ixx>10.0006</ixx>
+            <ixy>-0.000247944</ixy>
+            <ixz>4.72521e-05</ixz>
+            <iyy>10.0006</iyy>
+            <iyz>4.72521e-05</iyz>
+            <izz>10.0006</izz>
+          </inertia>
+        </inertial>
+        <collision name='Link6_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/home/hp/Proud_hp/src/mirobot_urdf_2/meshes/Link6.STL</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <collision name='Link6_fixed_joint_lump__Link_dicecup_collision_1'>
+          <pose>-0.5 -0.5 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/home/hp/Proud_hp/src/dicecup/meshes/base_link.STL</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='Link6_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/home/hp/Proud_hp/src/mirobot_urdf_2/meshes/Link6.STL</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <visual name='Link6_fixed_joint_lump__Link_dicecup_visual_1'>
+          <pose>-0.5 -0.5 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/home/hp/Proud_hp/src/dicecup/meshes/base_link.STL</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <plugin name='gazebo_ros_control' filename='libgazebo_ros_control.so'>
+        <robotNamespace>/mirobot</robotNamespace>
+        <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+        <legacyModeNS>1</legacyModeNS>
+      </plugin>
+      <frame name='modr' attached_to='Link6'>
+        <pose>0 0 0 0 -0 0</pose>
+      </frame>
+      <frame name='Link_dicecup' attached_to='modr'/>
+      <pose>0.21 0.21 0 0 0 -2.356</pose>
+    </model>
+  </world>
+</sdf>
