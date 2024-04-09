@@ -1,5 +1,5 @@
 import sys
-sys.path.append(r'D:/STOIL/src/franka-pybullet/src')
+sys.path.append(r'E:/Proud/franka-pybullet/src')
 
 import argparse
 import os
@@ -98,7 +98,7 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--file-path", type=str, default=r'D:/STOIL/src/franka-pybullet/src')
+    parser.add_argument("--file-path", type=str, default=r'E:/Proud/franka-pybullet/src')
     parser.add_argument("--expt-name", type=str, required=True)
 
     parser.add_argument("--dimension", type=int, default=7)

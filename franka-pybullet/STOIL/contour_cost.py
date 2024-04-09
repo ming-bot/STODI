@@ -34,7 +34,7 @@ def FFT(trajectory: list):
     # print(fft_result)
     # 计算频谱
     power_spectrum = np.abs(fft_result)
-    print(power_spectrum)
+    # print(power_spectrum)
 
     return power_spectrum
 
