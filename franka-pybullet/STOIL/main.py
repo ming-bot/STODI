@@ -12,6 +12,7 @@ from calculate_cost import Multi_Cost
 import copy
 import matplotlib.pyplot as plt
 from generate_initial_traj import *
+from visualization import Draw_trajectory
 
 def Draw_cost(cost_list):
     x = np.linspace(0, 1, len(cost_list))
@@ -30,13 +31,22 @@ def generate_multi_state(n7_trajectory, args):
 
     return {"position": copy.copy(n7_trajectory), "velocity": copy.copy(velocity), "acceleration": copy.copy(acceleration)}
 
+def write_trajectory(item, path):
+    traj_logfile = open(path, 'w')
+    for i in range(item.shape[0]):
+        traj_logfile.write(" ".join(str(thing) for thing in item[i]))
+        traj_logfile.write("\n")
+    traj_logfile.close()
+
 def main(args):
     # 0. input initial trajectory; trajectory should be np.array((N * 7))
     initial_trajectory = Joint_linear_initial(begin=[0, 0, 0, -1.6, 0, 1.87, 0], end=[0, -0.7, 0, -1.6, 0, 3.5, 0.7])
     
+    
     # 1. initial stomp
     robot = Panda()
     robot.setControlMode("position")
+    init_end_effector = robot.solveListKinematics(initial_trajectory)
     cost_function = Multi_Cost(panda=robot, init_trajectory=initial_trajectory, args=args)
     stomp_panda = Multi_dimensions_stomp(num_points=initial_trajectory.shape[0], args=args, cost_func=cost_function, 
     rangelimit_low_list=np.array([-6.28,-6.28,-6.28,-6.28,-6.28,-6.28,-6.28]), rangelimit_high_list=np.array([6.28,6.28,6.28,6.28,6.28,6.28,6.28]), 
@@ -56,7 +66,7 @@ def main(args):
     temp_iter_traj = copy.copy(initial_trajectory)
 
     # begin optimal loops
-    while(iter_num < 2000):
+    while(iter_num < 500):
         iter_num += 1
         # generate noisy trajectory
         stomp_panda.multiDimension_diffusion()
@@ -90,8 +100,12 @@ def main(args):
     # print(Qcost_list)
     Draw_cost(Qcost_total_list)
 
+    end_effector = robot.solveListKinematics(iter_traj)
+    Draw_trajectory(init_end_effector, end_effector)
+    # print(end_effector.shape)
+    write_trajectory(end_effector[:, :3], f"{args.file_path}/results/{args.expt_name}/trajectory_logs.txt")
+
     logfile = open(f"{args.file_path}/results/{args.expt_name}/result_logs.txt", 'w')
-    logfile.write(str(iter_traj) + "\n")
     logfile.write("\n".join(str(item) for item in Qcost_list))
     logfile.close()
 

@@ -1,12 +1,14 @@
 import sys
 sys.path.append(r'D:/STOIL/src/franka-pybullet/src')
 import argparse
-import pybullet as p
+# import pybullet as p
 import time
 from math import sin
 from generate_initial_traj import Joint_linear_initial
-from main import generate_multi_state
-from robot_model import Panda
+from main import generate_multi_state, Draw_cost
+# from robot_model import Panda
+from contour_cost import FFT
+import numpy as np
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -24,15 +26,26 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
 
-    duration = 1
-    stepsize = 1e-3
+    signal = np.random.rand(256, 3)
+    print(signal.shape)
+    fft_signal = FFT(signal)
+    print(fft_signal.shape)
+    # Draw_cost(fft_signal[2, :])
+    time_energ = np.sum(signal * signal)
+    freq_energ = (1.0 / (256 * 3)) * np.sum(fft_signal * fft_signal)
 
-    robot = Panda(stepsize)
-    robot.setControlMode("velocity")
-    initial = Joint_linear_initial(begin=[0, 0, 0, -1.6, 0, 1.87, 0], end=[0, -0.7, 0, -1.6, 0, 3.5, 0.7])
-    car_traj = robot.solveListKinematics(initial)
-    state_traj = generate_multi_state(car_traj, args)
-    print(state_traj)
+    print(time_energ, freq_energ)
+    print(time_energ - freq_energ)
+
+    # duration = 1
+    # stepsize = 1e-3
+
+    # robot = Panda(stepsize)
+    # robot.setControlMode("velocity")
+    # initial = Joint_linear_initial(begin=[0, 0, 0, -1.6, 0, 1.87, 0], end=[0, -0.7, 0, -1.6, 0, 3.5, 0.7])
+    # car_traj = robot.solveListKinematics(initial)
+    # state_traj = generate_multi_state(car_traj, args)
+    # print(state_traj)
     # init_state = generate_multi_state(initial, args)
     # num = 0
 

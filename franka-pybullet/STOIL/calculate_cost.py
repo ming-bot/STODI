@@ -39,8 +39,8 @@ class Multi_Cost():
         return control_cost
 
     def calculate_contour_cost(self):
-        cost = calculate_contour_cost(self.init_cartesian_traj, self.end_effector_traj_list[:, :3])
-        # cost = cal_dtw_similarity(self.init_cartesian_traj, self.end_effector_traj_list[:, :3])
+        # cost = calculate_contour_cost(self.init_cartesian_traj, self.end_effector_traj_list[:, :3])
+        cost = cal_dtw_similarity(self.init_cartesian_traj, self.end_effector_traj_list[:, :3])
         # print(cost)
         return cost
 

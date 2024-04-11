@@ -71,6 +71,6 @@ def calculate_contour_cost(init, comp):
     FFT_init = FFT(init)
     FFT_comp = FFT(comp)
     scaled_comp = Scaled_length(FFT_init, FFT_comp)
-    # return cal_kl_cost(Normalization(FFT_init), Normalization(scaled_comp))
+    return cal_kl_cost(Normalization(FFT_init), Normalization(scaled_comp))
     # return cal_mse_cost(Normalization(FFT_init), Normalization(scaled_comp))
-    return cal_mse_cost(FFT_init, scaled_comp)
+    # return cal_mse_cost(FFT_init, scaled_comp)
