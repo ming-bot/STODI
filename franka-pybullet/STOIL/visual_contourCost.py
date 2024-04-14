@@ -6,6 +6,8 @@ from robot_model import Panda
 from calculate_cost import Multi_Cost
 from main import generate_multi_state
 import matplotlib.pyplot as plt
+from scipy import stats
+import pandas as pd
 
 def Draw_multi_contourCost(cost_list):
     x = np.linspace(0, 1, cost_list.shape[0])
@@ -69,3 +71,51 @@ if __name__ == '__main__':
     print(contour_cost.shape)
 
     Draw_multi_contourCost(contour_cost)
+
+    t_stat, p_value = stats.ttest_ind(25000 * contour_cost[:, 0], 100000 * contour_cost[:, 1])
+    print("kl,nmse:", t_stat, p_value)
+    data = {"kl": 25000 * contour_cost[:, 0],
+    "nmse": 100000 * contour_cost[:, 1]}
+    df = pd.DataFrame(data)
+    pearson_corr = df['kl'].corr(df['nmse'])
+    print(f"Pearson相关系数(kl,nmse): {pearson_corr}")
+
+    t_stat, p_value = stats.ttest_ind(25000 * contour_cost[:, 0], contour_cost[:, 2] / 4)
+    print("kl,mse:", t_stat, p_value)
+    data = {"kl": 25000 * contour_cost[:, 0],
+    "mse": contour_cost[:, 2] / 4}
+    df = pd.DataFrame(data)
+    pearson_corr = df['kl'].corr(df['mse'])
+    print(f"Pearson相关系数(kl,mse): {pearson_corr}")
+    
+    t_stat, p_value = stats.ttest_ind(25000 * contour_cost[:, 0], contour_cost[:, 3])
+    print("kl,dtw:", t_stat, p_value)
+    data = {"kl": 25000 * contour_cost[:, 0],
+    "dtw": contour_cost[:, 3]}
+    df = pd.DataFrame(data)
+    pearson_corr = df['kl'].corr(df['dtw'])
+    print(f"Pearson相关系数(kl,dtw): {pearson_corr}")
+
+    t_stat, p_value = stats.ttest_ind(100000 * contour_cost[:, 1], contour_cost[:, 2] / 4)
+    print("nmse,mse:", t_stat, p_value)
+    data = {"nmse": 100000 * contour_cost[:, 1],
+    "mse": contour_cost[:, 2] / 4}
+    df = pd.DataFrame(data)
+    pearson_corr = df['nmse'].corr(df['mse'])
+    print(f"Pearson相关系数(nmse,mse): {pearson_corr}")
+
+    t_stat, p_value = stats.ttest_ind(100000 * contour_cost[:, 1], contour_cost[:, 3])
+    print("nmse,dtw:", t_stat, p_value)
+    data = {"nmse": 100000 * contour_cost[:, 1],
+    "dtw": contour_cost[:, 3]}
+    df = pd.DataFrame(data)
+    pearson_corr = df['nmse'].corr(df['dtw'])
+    print(f"Pearson相关系数(nmse,dtw): {pearson_corr}")
+
+    t_stat, p_value = stats.ttest_ind(contour_cost[:, 2] / 4, contour_cost[:, 3])
+    print("mse,dtw:", t_stat, p_value)
+    data = {"mse": contour_cost[:, 2] / 4,
+    "dtw": contour_cost[:, 3]}
+    df = pd.DataFrame(data)
+    pearson_corr = df['mse'].corr(df['dtw'])
+    print(f"Pearson相关系数(mse.dtw): {pearson_corr}")
