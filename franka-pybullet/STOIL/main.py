@@ -38,6 +38,15 @@ def write_trajectory(item, path):
         traj_logfile.write("\n")
     traj_logfile.close()
 
+def write_joints(item, path):
+    traj_logfile = open(path, 'w')
+    for i in range(item.shape[0]):
+        for j in range(item.shape[1]):
+            traj_logfile.write(" ".join(str(thing) for thing in item[i, j]))
+            traj_logfile.write(" ")
+        traj_logfile.write("\n")
+    traj_logfile.close()
+
 def main(args):
     # 0. input initial trajectory; trajectory should be np.array((N * 7))
     initial_trajectory = Joint_linear_initial(begin=[0, 0, 0, -1.6, 0, 1.87, 0], end=[0, -0.7, 0, -1.6, 0, 3.5, 0.7])
@@ -57,13 +66,16 @@ def main(args):
 
     Qcost_list = []
     Qcost_total_list = []
+    iter_joints = []
     iter_num = 0
 
     cost_function.Update_state(generate_multi_state(initial_trajectory, args=args))
-    Qcost_list.append(cost_function.calculate_total_cost())
+    Qcost_list.append(cost_function.calculate_total_cost('kl'))
 
     iter_traj = copy.copy(initial_trajectory)
     temp_iter_traj = copy.copy(initial_trajectory)
+
+    iter_joints.append(initial_trajectory)
 
     # begin optimal loops
     while(iter_num < 500):
@@ -89,9 +101,11 @@ def main(args):
             if args.reuse_state:
                 stomp_panda.update_reuse_traj(generate_multi_state(temp_iter_traj, args=args))
             cost_function.Update_state(generate_multi_state(temp_iter_traj, args=args))
-            Qcost_list.append(cost_function.calculate_total_cost())
+            Qcost_list.append(cost_function.calculate_total_cost('kl'))
             Qcost_total_list.append(np.sum(Qcost_list[-1]))
             iter_traj = temp_iter_traj
+            # print(iter_traj.shape)
+            iter_joints.append(copy.copy(iter_traj))
         # else:
         #     args.decay = args.decay * 0.5
         #     print(args.decay)
@@ -103,7 +117,9 @@ def main(args):
     end_effector = robot.solveListKinematics(iter_traj)
     Draw_trajectory(init_end_effector, end_effector)
     # print(end_effector.shape)
+    # print(np.array(iter_joints).shape)
     write_trajectory(end_effector[:, :3], f"{args.file_path}/results/{args.expt_name}/trajectory_logs.txt")
+    write_joints(np.array(iter_joints), f"{args.file_path}/results/{args.expt_name}/joints_logs.txt")
 
     logfile = open(f"{args.file_path}/results/{args.expt_name}/result_logs.txt", 'w')
     logfile.write("\n".join(str(item) for item in Qcost_list))

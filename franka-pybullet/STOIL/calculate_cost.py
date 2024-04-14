@@ -1,5 +1,5 @@
 import numpy as np
-from contour_cost import calculate_contour_cost, cal_dtw_similarity
+from contour_cost import cal_dtw_similarity, calculate_kl_contour_cost, calculate_mse_contour_cost, calculate_nmse_contour_cost
 import copy
 
 def generate_cartesian_state(trajectory, args):
@@ -38,9 +38,17 @@ class Multi_Cost():
         # print(control_cost.shape)
         return control_cost
 
-    def calculate_contour_cost(self):
-        # cost = calculate_contour_cost(self.init_cartesian_traj, self.end_effector_traj_list[:, :3])
-        cost = cal_dtw_similarity(self.init_cartesian_traj, self.end_effector_traj_list[:, :3])
+    def calculate_contour_cost(self, str):
+        if str == 'kl':
+            cost = calculate_kl_contour_cost(self.init_cartesian_traj, self.end_effector_traj_list[:, :3])
+        elif str == 'nmse':
+            cost = calculate_nmse_contour_cost(self.init_cartesian_traj, self.end_effector_traj_list[:, :3])
+        elif str == 'mse':
+            cost = calculate_mse_contour_cost(self.init_cartesian_traj, self.end_effector_traj_list[:, :3])
+        elif str == 'dtw':
+            cost = cal_dtw_similarity(self.init_cartesian_traj, self.end_effector_traj_list[:, :3])
+        else:
+            raise("Wrong Cost function!")
         # print(cost)
         return cost
 
@@ -70,9 +78,9 @@ class Multi_Cost():
         return q_v # N * 1
 
 
-    def calculate_total_cost(self):
+    def calculate_total_cost(self, str):
         control_cost = np.sum(self.calculate_control_cost())
-        contour_cost = self.calculate_contour_cost()
+        contour_cost = self.calculate_contour_cost(str)
         # if self.args.add_contourCost:
         #     effector_state_cost = np.sum(self.end_effector_state_cost() - np.ones(shape=control_cost.shape) * contour_cost)
         # else:

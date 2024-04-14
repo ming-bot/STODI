@@ -66,7 +66,7 @@ def Normalization(arr):
 def cal_mse_cost(data1, data2):
     return np.mean(np.sum(np.square(data1 - data2), axis=1), axis=0)
 
-def calculate_contour_cost(init, comp):
+def calculate_kl_contour_cost(init, comp):
     # init: N * 3, comp: N * 3
     FFT_init = FFT(init)
     FFT_comp = FFT(comp)
@@ -74,3 +74,18 @@ def calculate_contour_cost(init, comp):
     return cal_kl_cost(Normalization(FFT_init), Normalization(scaled_comp))
     # return cal_mse_cost(Normalization(FFT_init), Normalization(scaled_comp))
     # return cal_mse_cost(FFT_init, scaled_comp)
+
+def calculate_nmse_contour_cost(init, comp):
+    # init: N * 3, comp: N * 3
+    FFT_init = FFT(init)
+    FFT_comp = FFT(comp)
+    scaled_comp = Scaled_length(FFT_init, FFT_comp)
+    return cal_mse_cost(Normalization(FFT_init), Normalization(scaled_comp))
+    # return cal_mse_cost(FFT_init, scaled_comp)
+
+def calculate_mse_contour_cost(init, comp):
+    # init: N * 3, comp: N * 3
+    FFT_init = FFT(init)
+    FFT_comp = FFT(comp)
+    scaled_comp = Scaled_length(FFT_init, FFT_comp)
+    return cal_mse_cost(FFT_init, scaled_comp)
