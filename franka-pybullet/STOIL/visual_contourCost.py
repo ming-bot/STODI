@@ -18,8 +18,8 @@ def Draw_multi_contourCost(cost_list):
     y4 = cost_list[:, 3]
     plt.plot(x, 25000 * y1, label=labels[0], c='red', linewidth=1)
     plt.plot(x, 100000 * y2, label=labels[1], c='blue', linewidth=1)
-    plt.plot(x, y3 / 4, label=labels[2], c='green', linewidth=1)
-    plt.plot(x, y4, label=labels[3], c='black', linewidth=1)
+    plt.plot(x, y3 / 5, label=labels[2], c='green', linewidth=1)
+    plt.plot(x, 1.5 * y4, label=labels[3], c='black', linewidth=1)
 
     plt.legend()
     plt.show()
