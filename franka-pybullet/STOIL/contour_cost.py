@@ -75,6 +75,14 @@ def calculate_kl_contour_cost(init, comp):
     # return cal_mse_cost(Normalization(FFT_init), Normalization(scaled_comp))
     # return cal_mse_cost(FFT_init, scaled_comp)
 
+def calculate_js_contour_cost(init, comp):
+    # init: N * 3, comp: N * 3
+    FFT_init = FFT(init)
+    FFT_comp = FFT(comp)
+    scaled_comp = Scaled_length(FFT_init, FFT_comp)
+    js_div = 0.5 * cal_kl_cost(Normalization(FFT_init), (Normalization(FFT_init) + Normalization(scaled_comp)) / 2) + 0.5 * cal_kl_cost(Normalization(scaled_comp), (Normalization(FFT_init) + Normalization(scaled_comp)) / 2)
+    return js_div
+
 def calculate_nmse_contour_cost(init, comp):
     # init: N * 3, comp: N * 3
     FFT_init = FFT(init)
