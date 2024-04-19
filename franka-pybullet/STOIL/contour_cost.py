@@ -10,6 +10,9 @@ def cal_dtw_similarity(traj1, traj2):
     distance, _ = fastdtw(traj1, traj2, dist=euclidean)
     return distance
 
+def cal_mse_euclidean_similarity(traj1, traj2):
+    return np.sum((traj1 - traj2) * (traj1 - traj2))
+
 def calculate_kl_1d(distribution1, distribution2):
     kl_divergence = np.sum(rel_entr(distribution1, distribution2))
     return kl_divergence
@@ -64,7 +67,7 @@ def Normalization(arr):
     return normalized_array
 
 def cal_mse_cost(data1, data2):
-    return np.mean(np.sum(np.square(data1 - data2), axis=1), axis=0)
+    return np.mean(np.sum(np.square(data1 - data2), axis=0)) / 3
 
 def calculate_kl_contour_cost(init, comp):
     # init: N * 3, comp: N * 3
