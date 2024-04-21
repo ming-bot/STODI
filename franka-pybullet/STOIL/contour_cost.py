@@ -24,6 +24,17 @@ def cal_kl_cost(data1, data2):
         kl_cost += calculate_kl_1d(data1[i], data2[i])
     return kl_cost / L
 
+def _FFT(trajectory: list):
+    x = trajectory[:, 0]
+    y = trajectory[:, 1]
+    z = trajectory[:, 2]
+    multivariate_function = np.vstack((x, y, z))
+    
+    # 进行多元FFT变换
+    fft_ori = np.fft.fftn(multivariate_function)
+
+    return fft_ori
+
 def FFT(trajectory: list):
     x = trajectory[:, 0]
     y = trajectory[:, 1]
@@ -33,10 +44,10 @@ def FFT(trajectory: list):
     # 进行多元FFT变换
     fft_ori = np.fft.fftn(multivariate_function)
     # print(fft_ori)
-    fft_result = np.fft.fftshift(fft_ori)
+    # fft_result = np.fft.fftshift(fft_ori)
     # print(fft_result)
     # 计算频谱
-    power_spectrum = np.abs(fft_result)
+    power_spectrum = np.abs(fft_ori)
     # print(power_spectrum)
 
     return power_spectrum
@@ -100,3 +111,14 @@ def calculate_mse_contour_cost(init, comp):
     FFT_comp = FFT(comp)
     scaled_comp = Scaled_length(FFT_init, FFT_comp)
     return cal_mse_cost(FFT_init, scaled_comp)
+
+def cal_ex_item(init, comp):
+    FFT_init = FFT(init)
+    FFT_comp = FFT(comp)
+    # scaled_comp = Scaled_length(FFT_init, FFT_comp)
+    # print(FFT_init.shape)
+
+    item1 = np.sum(FFT_init * FFT_comp)
+    item2 = np.abs(np.sum(_FFT(init) * np.conj(_FFT(comp))))
+
+    return 2*(item1 - item2)

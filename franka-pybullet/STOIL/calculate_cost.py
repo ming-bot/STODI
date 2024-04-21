@@ -1,5 +1,5 @@
 import numpy as np
-from contour_cost import cal_dtw_similarity, calculate_kl_contour_cost, calculate_mse_contour_cost, calculate_nmse_contour_cost, calculate_js_contour_cost, cal_mse_euclidean_similarity
+from contour_cost import cal_dtw_similarity, calculate_kl_contour_cost, calculate_mse_contour_cost, calculate_nmse_contour_cost, calculate_js_contour_cost, cal_mse_euclidean_similarity, cal_ex_item
 import copy
 
 def generate_cartesian_state(trajectory, args):
@@ -51,6 +51,8 @@ class Multi_Cost():
             cost = calculate_js_contour_cost(self.init_cartesian_traj, self.end_effector_traj_list[:, :3])
         elif str == 'emse':
             cost = cal_mse_euclidean_similarity(self.init_cartesian_traj, self.end_effector_traj_list[:, :3])
+        elif str == 'ex':
+            cost = cal_ex_item(self.init_cartesian_traj, self.end_effector_traj_list[:, :3])
         else:
             raise("Wrong Cost function!")
         # print(cost)

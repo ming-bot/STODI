@@ -11,20 +11,22 @@ import pandas as pd
 
 def Draw_multi_contourCost(cost_list):
     x = np.linspace(0, 1, cost_list.shape[0])
-    labels = ['kl', 'nmse', 'mse', 'dtw', 'js', 'emse']
+    labels = ['kl', 'nmse', 'mse', 'dtw', 'js', 'emse', 'ex']
     y1 = cost_list[:, 0]
     y2 = cost_list[:, 1]
     y3 = cost_list[:, 2]
     y4 = cost_list[:, 3]
     y5 = cost_list[:, 4]
     y6 = cost_list[:, 5]
+    y7 = cost_list[:, 6]
     # plt.plot(x, 25000 * y1, label=labels[0], c='red', linewidth=1)
     # plt.plot(x, 100000 * y2, label=labels[1], c='blue', linewidth=1)
-    # plt.plot(x, y3 / 5, label=labels[2], c='green', linewidth=1)
-    plt.plot(x, y3, label=labels[2], c='green', linewidth=1)
-    # plt.plot(x, y4 / 5, label=labels[3], c='black', linewidth=1)
+    plt.plot(x, 768*y3, label=labels[2], c='green', linewidth=1)
+    # plt.plot(x, y3, label=labels[2], c='green', linewidth=1)
+    plt.plot(x, 3*y4*y4, label=labels[3], c='black', linewidth=1)
     # plt.plot(x, 160000 * y5, label=labels[4], c='orange', linewidth=1)
-    plt.plot(x, y6, label=labels[5], c='purple', linewidth=1)
+    # plt.plot(x, y6, label=labels[5], c='purple', linewidth=1)
+    plt.plot(x, 768*y3 + y7, label=labels[6], c='brown', linewidth=1)
 
     plt.legend()
     plt.show()
@@ -72,7 +74,8 @@ if __name__ == '__main__':
                              cost_function.calculate_contour_cost('mse'),
                              cost_function.calculate_contour_cost('dtw'),
                              cost_function.calculate_contour_cost('js'),
-                             cost_function.calculate_contour_cost('emse')
+                             cost_function.calculate_contour_cost('emse'),
+                             cost_function.calculate_contour_cost('ex')
         ])
     contour_cost = np.array(contour_cost)
     print(contour_cost.shape)
