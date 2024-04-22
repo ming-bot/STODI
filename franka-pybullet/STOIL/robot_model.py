@@ -1,15 +1,17 @@
+import pybullet as p
 import numpy as np
 import time
-import pybullet as p
+import pybullet_data
+from pprint import pprint
 
 
 class Panda:
-    def __init__(self, stepsize=1e-3, realtime=0) -> object:
+    def __init__(self, stepsize=1e-3, realtime=0):
         self.t = 0.0
         self.stepsize = stepsize
         self.realtime = realtime
 
-        self.control_mode = "torque" 
+        self.control_mode = "torque"
 
         self.position_control_gain_p = [0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
         self.position_control_gain_d = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
@@ -18,7 +20,8 @@ class Panda:
         # connect pybullet
         p.connect(p.GUI)
         p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0)
-        p.resetDebugVisualizerCamera(cameraDistance=1.5, cameraYaw=30, cameraPitch=-20, cameraTargetPosition=[0, 0, 0.5])
+        p.resetDebugVisualizerCamera(cameraDistance=1.5, cameraYaw=30, cameraPitch=-20,
+                                     cameraTargetPosition=[0, 0, 0.5])
 
         p.resetSimulation()
         p.setTimeStep(self.stepsize)
@@ -28,13 +31,16 @@ class Panda:
         # load models
         p.setAdditionalSearchPath("../models")
 
-        self.plane = p.loadURDF("plane/plane.urdf", useFixedBase=True)
+        self.plane = p.loadURDF("plane/plane.urdf",
+                                useFixedBase=True)
         p.changeDynamics(self.plane, -1, restitution=.95)
 
-        self.robot = p.loadURDF("panda/panda.urdf", useFixedBase=True, flags=p.URDF_USE_SELF_COLLISION)
-        
+        self.robot = p.loadURDF("panda/panda.urdf",
+                                useFixedBase=True,
+                                flags=p.URDF_USE_SELF_COLLISION)
+
         # robot parameters
-        self.dof = p.getNumJoints(self.robot) - 1   # Virtual fixed joint between the flange and last link
+        self.dof = p.getNumJoints(self.robot) - 1  # Virtual fixed joint between the flange and last link
         if self.dof != 7:
             raise Exception('wrong urdf file: number of joints is not 7')
 
@@ -50,21 +56,29 @@ class Panda:
             self.joints.append(j)
             self.q_min.append(joint_info[8])
             self.q_max.append(joint_info[9])
-            self.target_pos.append((self.q_min[j] + self.q_max[j])/2.0)
+            self.target_pos.append((self.q_min[j] + self.q_max[j]) / 2.0)
             self.target_torque.append(0.)
-            # set damping
-            p.changeDynamics(self.robot, j, linearDamping=0.1, angularDamping=100)
+        # set damping
+        # p.changeDynamics(self.robot, j, linearDamping=0.1, angularDamping=100)
+
+        # 添加资源路径
+        p.setAdditionalSearchPath(pybullet_data.getDataPath())
+
+        # logId = p.startStateLogging(p.STATE_LOGGING_VIDEO_MP4, "./video.mp4")
+        # p.stopStateLogging(logId)
 
         self.reset()
 
     def reset(self):
-        self.t = 0.0        
+        self.t = 0.0
         self.control_mode = "torque"
+        # self.target_pos = [0., 0., 0., -1.6, 0., 1.87, 0.]    # 低
+        self.target_pos = [0., -0.7, 0.0, -1.6, 0., 3.5, 0.7]  # 高 new
         for j in range(self.dof):
-            self.target_pos[j] = (self.q_min[j] + self.q_max[j])/2.0
+            # self.target_pos[j] = (self.q_min[j] + self.q_max[j])/2.0
             self.target_torque[j] = 0.
             p.resetJointState(self.robot, j, targetValue=self.target_pos[j])
-
+        # print("Successful Reset!")
         self.resetController()
 
     def step(self):
@@ -78,7 +92,7 @@ class Panda:
                                     controlMode=p.VELOCITY_CONTROL,
                                     forces=[0. for i in range(self.dof)])
 
-    def setControlMode(self, mode) -> object:
+    def setControlMode(self, mode):
         if mode == "position":
             self.control_mode = "position"
         elif mode == "velocity":
@@ -99,23 +113,25 @@ class Panda:
                                     forces=self.max_torque,
                                     positionGains=self.position_control_gain_p,
                                     velocityGains=self.position_control_gain_d)
-        
+
     def setTargetVelocity(self, target_velocity):
         self.target_vel = target_velocity
         p.setJointMotorControlArray(bodyUniqueId=self.robot,
                                     jointIndices=self.joints,
                                     controlMode=p.VELOCITY_CONTROL,
-                                    targetVelocities=self.target_vel
-                                    )
+                                    targetVelocities=self.target_vel)
 
     def setTargetTorques(self, target_torque):
         self.target_torque = target_torque
-        # 控制单个关节的运动
-        for j in range(p.getNumJoints(self.robot)):
-            p.setJointMotorControl2(self.robot, j, p.TORQUE_CONTROL, force=target_torque[j-1]*10)
+        # 控制单个关节的运动（好像有问题，先别用）
+        # for j in range(p.getNumJoints(self.robot)):
+        #     p.setJointMotorControl2(bodyUniqueId=self.robot, jointIndex=j, controlMode=p.TORQUE_CONTROL, force=target_torque[j-1])
 
         # 同时控制多个关节的运动
-        # p.setJointMotorControlArray(self.robot, self.joints, p.TORQUE_CONTROL, self.target_torque)
+        p.setJointMotorControlArray(bodyUniqueId=self.robot,
+                                    jointIndices=self.joints,
+                                    controlMode=p.TORQUE_CONTROL,
+                                    forces=self.target_torque)
 
     def getJointStates(self):
         joint_states = p.getJointStates(self.robot, self.joints)
@@ -150,9 +166,9 @@ class Panda:
         # 恢复原始关节状态
         for i in range(len(original_joint_positions)):
             p.resetJointState(self.robot, i, original_joint_positions[i])
-        
+
         return end_effector_array
-    
+
     def traj_control(self, joints_array):
         duration = 0.5
         num = 0
@@ -162,7 +178,7 @@ class Panda:
                 num += 1
             self.step()
             time.sleep(self.stepsize)
-    
+
     def traj_vel_control(self, joints_vel_array):
         duration = 1
         num = 0
@@ -173,15 +189,30 @@ class Panda:
             self.step()
             time.sleep(self.stepsize)
 
-    def traj_torque_control(self, joints_torque_array):
-        print(joints_torque_array)
-        duration = 256*0.025
+    def traj_torque_control(self, robot, pos_planned, vel_planned, acc_planned):
+        duration = 5#256*0.025
         num = 0
-        for i in range(int(duration/1e-3)):
-            if i % int(0.025 / 1e-3) == 0 and num < joints_torque_array.shape[0]:
-                self.setTargetTorques(joints_torque_array[num, :]*1000)
-                num += 1
+        # print(len(torques))
+        for i in range(int(duration/self.stepsize)):
+            # if i % int(0.025 / self.stepsize) == 0 and num < 255:
+            pos, vel = robot.getJointStates()
+            # print(pos)
+            acc = [0 for x in pos]
+            # solveInverseDynamics 的输入必须是 list 格式的
+            joints_torque = robot.solveInverseDynamics(list(pos), list(vel), acc)#list(acc_planned[num + 1]))
+            self.setTargetTorques(joints_torque)
+            # self.setTargetTorques([t*0.5 for t in joints_torque])
+            # num += 1
             self.step()
-            print(self.t)
-            print(self.target_torque)
+            # print(self.t)
+            # print(self.target_torque)
             time.sleep(self.stepsize)
+
+if __name__ == "__main__":
+    robot = Panda(realtime=1)
+    while True:
+        pass
+
+
+
+
