@@ -20,7 +20,7 @@ if __name__ == "__main__":
     robot.setControlMode("torque")
 
     # 读取规划好的轨迹状态，获得 array 形式的 pos_desired, vel_desired, acc_desired
-    path = 'C:/Users/hp/PycharmProjects/trajOptimize/franka-pybullet/src/results/0419new'
+    path = 'C:/Users/hp/PycharmProjects/trajOptimize/franka-pybullet/src/results/0419'
     pos_str, vel_str, acc_str = read_state(path + "/position.txt"), read_state(path + "/velocity.txt"), read_state(
         path + "/acceleration.txt")  # str 格式
     pos_tmp, vel_tmp, acc_tmp = np.array(pos_str.split()), np.array(vel_str.split()), np.array(
@@ -46,8 +46,7 @@ if __name__ == "__main__":
             robot.reset()
             robot.setControlMode("torque")
 
-        # if i % 5 == 0 and num <= 255:
-        if num <= 255:
+        if i % 5 == 0 and num <= 255:
             pos_desired_update = pos_desired[num]
             vel_desired_update = vel_desired[num]
             acc_desired_update = acc_desired[num]
@@ -58,7 +57,7 @@ if __name__ == "__main__":
 
         # 设计预期 acceleration
         acc = [0 for x in pos_simulated]
-        kv, kp = 100, 100   # 位置和速度的比例控制器增益矩阵，但我懒就先写 1 假装是单位矩阵好了
+        kv, kp = 10, 100   # 位置和速度的比例控制器增益矩阵，但我懒就先写 1 假装是单位矩阵好了
         acc_feedback = list(10*(acc_desired_update - kv * (np.array(vel_simulated) - vel_desired_update) - kp * (
                 np.array(pos_simulated) - pos_desired_update)))
         # print(acc_feedback)
