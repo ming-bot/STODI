@@ -76,7 +76,7 @@ class single_dimension_stomp():
         R = np.dot(A.T, A)
 
         inv_R = np.linalg.inv(R)
-        scale_number = np.array((1.0 / (self.num_points)) / np.max(inv_R, axis=0))
+        scale_number = np.array((10.0 / (self.num_points)) / np.max(inv_R, axis=0))
         # scale_number = np.array((np.abs(self.state_record["position"][-1] - self.state_record["position"][0])\
         # / (self.num_points)) / np.max(inv_R, axis=0))
         M = np.zeros((self.num_points, self.num_points))

@@ -1,18 +1,25 @@
 import sys
-sys.path.append(r'D:/STOIL/src/franka-pybullet/src')
+sys.path.append(r'E:/STOIL/src/franka-pybullet/src')
 import argparse
 # import pybullet as p
 import time
 from math import sin
 from generate_initial_traj import Joint_linear_initial, Generate_demonstration
 from main import generate_multi_state, Draw_cost
+from visualization import Draw_3trajectory
 from robot_model import Panda
 from contour_cost import FFT
 import numpy as np
 
+def read_state(path):
+    state_logfile = open(path, 'r')
+    content = state_logfile.readlines()
+    state_logfile.close()
+    return content
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--file-path", type=str, default=r'D:/STOIL/src/franka-pybullet/src')
+    parser.add_argument("--file-path", type=str, default=r'E:/STOIL/src/franka-pybullet/src')
 
     parser.add_argument("--dimension", type=int, default=7)
     parser.add_argument("--add-contourCost", type=bool, default=False)
@@ -31,13 +38,28 @@ if __name__ == '__main__':
     stepsize = 1e-3
 
     robot = Panda(stepsize)
-    initial = Joint_linear_initial(begin=[0, 0, 0, -1.6, 0, 1.87, 0], end=[0, -0.7, 0, -1.6, 0, 3.5, 0.7])
-    initial_state = generate_multi_state(initial, args)
+    # initial = Joint_linear_initial(begin=[0, 0, 0, -1.6, 0, 1.87, 0], end=[0, -0.7, 0, -1.6, 0, 3.5, 0.7])
+    # initial_state = generate_multi_state(initial, args)
 
-    demostration = Generate_demonstration(begin=[0, 0, 0, -1.6, 0, 1.87, 0], end=[0, -0.7, 0, -1.6, 0, 3.5, 0.7])
-    demostration_state = generate_multi_state(demostration, args)
+    # demostration = Generate_demonstration(begin=[0, 0, 0, -1.6, 0, 1.87, 0], end=[0, -0.7, 0, -1.6, 0, 3.5, 0.7])
+    # demostration_state = generate_multi_state(demostration, args)
 
-    robot.traj_torque_control(initial_state["position"], initial_state["velocity"], initial_state["acceleration"])
-    print("motion success!")
-    robot.reset()
-    robot.traj_torque_control(demostration_state["position"], demostration_state["velocity"], demostration_state["acceleration"])
+    # robot.traj_torque_control(initial_state["position"], initial_state["velocity"], initial_state["acceleration"])
+    # print("motion success!")
+    # robot.reset()
+    # robot.traj_torque_control(demostration_state["position"], demostration_state["velocity"], demostration_state["acceleration"])
+
+    path = r'E:/Proud/franka-pybullet/src/results/0427/trajectory_logs.txt'
+    traj = read_state(path)
+    for i in range(len(traj)):
+        traj[i] = traj[i].split()
+    traj = np.array(traj).astype(np.float64)
+    
+    demostrantion = Generate_demonstration(begin=[0, 0, 0, -1.6, 0, 1.87, 0], end=[0, -0.7, 0, -1.6, 0, 3.5, 0.7])
+    demostrantion_end_effector = np.array(robot.solveListKinematics(demostrantion))
+
+
+    initial_trajectory = Joint_linear_initial(begin=[0, 0, 0, -1.6, 0, 1.87, 0], end=[0, -0.7, 0, -1.6, 0, 3.5, 0.7])
+    init_end_effector = robot.solveListKinematics(initial_trajectory)
+
+    Draw_3trajectory(init_end_effector, traj, demostrantion_end_effector)

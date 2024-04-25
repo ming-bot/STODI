@@ -202,7 +202,7 @@ class Panda:
                 self.reset()
                 self.setControlMode("torque")
             
-            if i % int(0.005 / self.stepsize) == 0 and num < 255:
+            if i % int(0.005 / self.stepsize) == 0 and num < 128:
                 pos_desired_update = pos_planned[num]
                 vel_desired_update = vel_planned[num]
                 acc_desired_update = acc_planned[num]

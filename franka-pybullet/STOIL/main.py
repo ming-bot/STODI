@@ -62,7 +62,7 @@ def main(args):
     vellimit_low_list=np.array([-50,-50,-50,-50,-50,-50,-50]), vellimit_high_list=np.array([50,50,50,50,50,50,50]),
     acclimit_low_list=np.array([-1000,-1000,-1000,-1000,-1000,-1000,-1000]), acclimit_high_list=np.array([1000,1000,1000,1000,1000,1000,1000]))
 
-    stomp_panda.input_demonstration(demostrantion)
+    # stomp_panda.input_demonstration(demostrantion)
 
     Qcost_list = []
     Qcost_total_list = []
@@ -110,6 +110,8 @@ def main(args):
         #     args.decay = args.decay * 0.5
         #     print(args.decay)
     
+    print("loop is over!")
+    input()
     final_traj_state = generate_multi_state(iter_traj, args)
     robot.traj_torque_control(final_traj_state["position"], final_traj_state["velocity"], final_traj_state["acceleration"])
     # robot.traj_control(iter_traj)
@@ -138,7 +140,7 @@ if __name__ == "__main__":
     parser.add_argument("--reuse-state", type=bool, default=True)
     parser.add_argument("--reuse-num", type=int, default=10)
     parser.add_argument("--K", type=int, default=20)
-    parser.add_argument("--decay", type=float, default=0.99)
+    parser.add_argument("--decay", type=float, default=0.9999)
 
     parser.add_argument("--control-frequency", type=float, default=10)
     parser.add_argument("--sample-frequency", type=float, default=20)
