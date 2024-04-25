@@ -40,19 +40,15 @@ class Multi_dimensions_stomp():
         # 记录 reuse state
         if self.args.reuse_state:
             self.reuse_trajectory = 0
-            self.reuse_state = {"position": np.zeros((self.args.reuse_num, self.num_points, 7)), "velocity": np.zeros((self.args.reuse_num, self.num_points, 7)), "acceleration": np.zeros((self.args.reuse_num, self.num_points, 7))}
+            self.reuse_state = {"position": np.zeros((self.args.reuse_num, self.num_points, 7)),
+                                "velocity": np.zeros((self.args.reuse_num, self.num_points, 7)), 
+                                "acceleration": np.zeros((self.args.reuse_num, self.num_points, 7))}
             self.reuse_weights = np.zeros((self.args.reuse_num, self.num_points))
-        
-        if self.args.add_contourCost:
-            self.initial_trajectory = np.zeros((self.num_points, 7))
     
     def input_demonstration(self, joints_traj):
         # joints_traj should be N * 7
         for i in range(self.dimensions_num):
             self.single_dimension_list[i].Update_state(joints_traj[:, i])
-        
-        if self.args.add_contourCost:
-            self.initial_trajectory = joints_traj
     
     def multi_limit_check(self, joints_traj):
         states_info = []

@@ -2,11 +2,13 @@ import numpy as np
 import copy
 
 def generate_state(trajectory, args):
-    # trajectory is point list, and we assume the begin point's velocity is zero
+    # Target: Generate state including "position", "velocity" and "acceleration" according to the position trajectory
+    # Parameters: trajectory is a point list, the velocity list and the acceleration list are the same shape 
+    # We assume the begin point's velocity is zero
     velocity = np.zeros(trajectory.shape)
     acceleration = np.zeros(trajectory.shape)
     dt = 1.0 / args.sample_frequency
-
+    # one dimension
     if trajectory.ndim == 1:
         for i in range(trajectory.shape[0] - 1):
             acceleration[i] = (2.0 / dt ** 2) * (trajectory[i + 1] - trajectory[i] - velocity[i] * dt)
@@ -14,6 +16,7 @@ def generate_state(trajectory, args):
         state = {"position": copy.copy(trajectory),
                 "velocity": copy.copy(velocity),
                 "acceleration": copy.copy(acceleration)}
+    # multiple dimensions
     elif trajectory.ndim == 2:
         for i in range(trajectory.shape[0] - 1):
             acceleration[:, i] = (2.0 / dt ** 2) * (trajectory[:, i + 1] - trajectory[:, i] - velocity[:, i] * dt)
@@ -54,14 +57,15 @@ class single_dimension_stomp():
         else:
             self.acc_limit.append(acclimit_high)
             self.acc_limit.append(acclimit_low)
-        # 记录 state
+        
+        # 记录 state, according to the num_points
         self.state_record = {"position": np.zeros(self.num_points), 
                             "velocity": np.zeros(self.num_points), 
                             "acceleration": np.zeros(self.num_points)}
-        
+        # according to the num_points
         self.diffusion_trajectory = np.zeros((1, 7))
         self.diffusion_noisy = np.zeros((1, 7))
-        # 记录 key matrix
+        # 记录 key matrix, according to the num_points
         self.A, self.inv_R, self.M = self.calculate_inv_R_and_M()
 
     def calculate_inv_R_and_M(self):
@@ -76,6 +80,7 @@ class single_dimension_stomp():
         R = np.dot(A.T, A)
 
         inv_R = np.linalg.inv(R)
+        # scale num can be changed
         scale_number = np.array((10.0 / (self.num_points)) / np.max(inv_R, axis=0))
         # scale_number = np.array((np.abs(self.state_record["position"][-1] - self.state_record["position"][0])\
         # / (self.num_points)) / np.max(inv_R, axis=0))
