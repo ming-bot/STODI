@@ -72,15 +72,15 @@ class Multi_Cost():
         acceleration_vector_size = np.sqrt(acceleration[:, 0]**2 + acceleration[:, 1]**2 + acceleration[:, 2]**2) # N * 1
 
         # 暂定的q
-        VELOCITY_BAR = 0.1
-        dt = 1.0 / self.args.sample_frequency
-        q_v = dt * (VELOCITY_BAR * np.ones(velocity.shape[0]) - velocity_vector_size)**2 \
-        - acceleration_vector_size * dt**2 * (VELOCITY_BAR * np.ones((velocity.shape[0])) - velocity_vector_size) \
-        + (1.0 / 3) * dt **3 * acceleration_vector_size * acceleration_vector_size
+
+        # VELOCITY_BAR = 0.1
+        # dt = 1.0 / self.args.sample_frequency
+        # q_v = dt * (VELOCITY_BAR * np.ones(velocity.shape[0]) - velocity_vector_size)**2 \
+        # - acceleration_vector_size * dt**2 * (VELOCITY_BAR * np.ones((velocity.shape[0])) - velocity_vector_size) \
+        # + (1.0 / 3) * dt **3 * acceleration_vector_size * acceleration_vector_size
 
         if self.args.add_contourCost:
-            pass
-            # q_v += np.ones(shape=q_v.shape) * self.calculate_contour_cost()
+            q_v = np.ones(velocity.shape[0]) * self.calculate_contour_cost('dtw')
         return q_v # N * 1
 
 

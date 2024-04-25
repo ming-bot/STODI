@@ -72,8 +72,8 @@ class Panda:
     def reset(self):
         self.t = 0.0
         self.control_mode = "torque"
-        # self.target_pos = [0., 0., 0., -1.6, 0., 1.87, 0.]    # 低
-        self.target_pos = [0., -0.7, 0.0, -1.6, 0., 3.5, 0.7]  # 高 new
+        self.target_pos = [0., 0., 0., -1.6, 0., 1.87, 0.]    # 低
+        # self.target_pos = [0., -0.7, 0.0, -1.6, 0., 3.5, 0.7]  # 高 new
         for j in range(self.dof):
             # self.target_pos[j] = (self.q_min[j] + self.q_max[j])/2.0
             self.target_torque[j] = 0.
@@ -189,17 +189,34 @@ class Panda:
             self.step()
             time.sleep(self.stepsize)
 
-    def traj_torque_control(self, robot, pos_planned, vel_planned, acc_planned):
-        duration = 5#256*0.025
-        num = 0
-        # print(len(torques))
-        for i in range(int(duration/self.stepsize)):
-            # if i % int(0.025 / self.stepsize) == 0 and num < 255:
-            pos, vel = robot.getJointStates()
-            # print(pos)
-            acc = [0 for x in pos]
+    def traj_torque_control(self, pos_planned, vel_planned, acc_planned):
+        duration = 2 # 256 * 0.025
+        num = 1
+        self.setControlMode("torque")
+
+        for i in range(int(duration / self.stepsize)):
+            if i % 100 == 0:
+                print("Simulation time: {:.3f}".format(self.t))
+
+            if i % 10000 == 0:
+                self.reset()
+                self.setControlMode("torque")
+            
+            if i % int(0.005 / self.stepsize) == 0 and num < 255:
+                pos_desired_update = pos_planned[num]
+                vel_desired_update = vel_planned[num]
+                acc_desired_update = acc_planned[num]
+                num += 1
+
+            pos, vel = self.getJointStates()
+
+            # acc = [0 for x in pos]
+            kv, kp = 10, 100   # 位置和速度的比例控制器增益矩阵，但我懒就先写 1 假装是单位矩阵好了
+            acc_feedback = list(10*(acc_desired_update - kv * (np.array(vel) - vel_desired_update) - kp * (
+                    np.array(pos) - pos_desired_update)))
+            
             # solveInverseDynamics 的输入必须是 list 格式的
-            joints_torque = robot.solveInverseDynamics(list(pos), list(vel), acc)#list(acc_planned[num + 1]))
+            joints_torque = self.solveInverseDynamics(list(pos), list(vel), acc_feedback)#list(acc_planned[num + 1]))
             self.setTargetTorques(joints_torque)
             # self.setTargetTorques([t*0.5 for t in joints_torque])
             # num += 1
@@ -208,10 +225,10 @@ class Panda:
             # print(self.target_torque)
             time.sleep(self.stepsize)
 
-if __name__ == "__main__":
-    robot = Panda(realtime=1)
-    while True:
-        pass
+# if __name__ == "__main__":
+#     robot = Panda(realtime=1)
+#     while True:
+#         pass
 
 
 

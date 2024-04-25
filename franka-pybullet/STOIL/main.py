@@ -50,19 +50,19 @@ def write_joints(item, path):
 def main(args):
     # 0. input initial trajectory; trajectory should be np.array((N * 7))
     initial_trajectory = Joint_linear_initial(begin=[0, 0, 0, -1.6, 0, 1.87, 0], end=[0, -0.7, 0, -1.6, 0, 3.5, 0.7])
-    
-    
+    demostrantion = Generate_demonstration(begin=[0, 0, 0, -1.6, 0, 1.87, 0], end=[0, -0.7, 0, -1.6, 0, 3.5, 0.7])
+
     # 1. initial stomp
     robot = Panda()
-    robot.setControlMode("position")
+    # robot.setControlMode("position")
     init_end_effector = robot.solveListKinematics(initial_trajectory)
-    cost_function = Multi_Cost(panda=robot, init_trajectory=initial_trajectory, args=args)
+    cost_function = Multi_Cost(panda=robot, init_trajectory=demostrantion, args=args)
     stomp_panda = Multi_dimensions_stomp(num_points=initial_trajectory.shape[0], args=args, cost_func=cost_function, 
     rangelimit_low_list=np.array([-6.28,-6.28,-6.28,-6.28,-6.28,-6.28,-6.28]), rangelimit_high_list=np.array([6.28,6.28,6.28,6.28,6.28,6.28,6.28]), 
     vellimit_low_list=np.array([-50,-50,-50,-50,-50,-50,-50]), vellimit_high_list=np.array([50,50,50,50,50,50,50]),
     acclimit_low_list=np.array([-1000,-1000,-1000,-1000,-1000,-1000,-1000]), acclimit_high_list=np.array([1000,1000,1000,1000,1000,1000,1000]))
 
-    stomp_panda.input_demonstration(initial_trajectory)
+    stomp_panda.input_demonstration(demostrantion)
 
     Qcost_list = []
     Qcost_total_list = []
@@ -78,7 +78,7 @@ def main(args):
     iter_joints.append(initial_trajectory)
 
     # begin optimal loops
-    while(iter_num < 500):
+    while(iter_num < 300):
         iter_num += 1
         # generate noisy trajectory
         stomp_panda.multiDimension_diffusion()
@@ -110,6 +110,8 @@ def main(args):
         #     args.decay = args.decay * 0.5
         #     print(args.decay)
     
+    final_traj_state = generate_multi_state(iter_traj, args)
+    robot.traj_torque_control(final_traj_state["position"], final_traj_state["velocity"], final_traj_state["acceleration"])
     # robot.traj_control(iter_traj)
     # print(Qcost_list)
     Draw_cost(Qcost_total_list)
