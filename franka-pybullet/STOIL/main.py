@@ -7,6 +7,7 @@ import os.path as osp
 import numpy as np
 import copy
 from MultiDimension import Multi_dimensions_stomp
+from sentry import Sentry, generate_multi_state
 from robot_model import Panda
 from calculate_cost import Multi_Cost
 import copy
@@ -20,16 +21,6 @@ def Draw_cost(cost_list):
     plt.plot(x, y, linewidth=1)
     plt.show()
 
-def generate_multi_state(n7_trajectory, args):
-    velocity = np.zeros(shape=n7_trajectory.shape)
-    acceleration = np.zeros(shape=n7_trajectory.shape)
-    dt = 1.0 / args.sample_frequency
-    
-    for i in range(n7_trajectory.shape[0] - 1):
-        acceleration[i, :] = (2.0 / dt ** 2) * (n7_trajectory[i + 1, :] - n7_trajectory[i, :] - velocity[i, :] * dt)
-        velocity[i + 1, :] = velocity[i, :] + acceleration[i, :] * dt
-
-    return {"position": copy.copy(n7_trajectory), "velocity": copy.copy(velocity), "acceleration": copy.copy(acceleration)}
 
 def write_trajectory(item, path):
     traj_logfile = open(path, 'w')
@@ -50,83 +41,117 @@ def write_joints(item, path):
 def main(args):
     # 0. input initial trajectory; trajectory should be np.array((N * 7))
     initial_trajectory = Joint_linear_initial(begin=[0, 0, 0, -1.6, 0, 1.87, 0], end=[0, -0.7, 0, -1.6, 0, 3.5, 0.7])
+    # 想要模仿的Demonstration
     demostrantion = Generate_demonstration(begin=[0, 0, 0, -1.6, 0, 1.87, 0], end=[0, -0.7, 0, -1.6, 0, 3.5, 0.7])
 
     # 1. initial stomp
     robot = Panda()
-    # robot.setControlMode("position")
     init_end_effector = robot.solveListKinematics(initial_trajectory)
+    # Cost Function
     cost_function = Multi_Cost(panda=robot, init_trajectory=demostrantion, args=args)
+    # Sentry
+    sentry = Sentry(initial_trajectory, cost_function, args)
+    # 多维Stomp框架
     stomp_panda = Multi_dimensions_stomp(num_points=initial_trajectory.shape[0], args=args, cost_func=cost_function, 
     rangelimit_low_list=np.array([-6.28,-6.28,-6.28,-6.28,-6.28,-6.28,-6.28]), rangelimit_high_list=np.array([6.28,6.28,6.28,6.28,6.28,6.28,6.28]), 
     vellimit_low_list=np.array([-50,-50,-50,-50,-50,-50,-50]), vellimit_high_list=np.array([50,50,50,50,50,50,50]),
     acclimit_low_list=np.array([-1000,-1000,-1000,-1000,-1000,-1000,-1000]), acclimit_high_list=np.array([1000,1000,1000,1000,1000,1000,1000]))
 
-    # stomp_panda.input_demonstration(demostrantion)
+    voyager_Qcost_list = []
+    voyager_Qcost_total_list = []
+    voyager_iter_joints = []
 
-    Qcost_list = []
-    Qcost_total_list = []
-    iter_joints = []
+    neighbour_Qcost_list = []
+    neighbour_Qcost_total_list = []
+    neighbour_iter_joints = []
+
     iter_num = 0
+    total_iter_num = 300
 
+    # 计算Cost标准步骤(for example)
     cost_function.Update_state(generate_multi_state(initial_trajectory, args=args))
-    Qcost_list.append(cost_function.calculate_total_cost('kl'))
+    voyager_Qcost_list.append(cost_function.calculate_total_cost('mse'))
+    voyager_Qcost_total_list.append(np.sum(voyager_Qcost_list[-1]))
+    neighbour_Qcost_list.append(cost_function.calculate_total_cost('mse'))
+    neighbour_Qcost_total_list.append(np.sum(neighbour_Qcost_list[-1]))
 
-    iter_traj = copy.copy(initial_trajectory)
-    temp_iter_traj = copy.copy(initial_trajectory)
-
-    iter_joints.append(initial_trajectory)
+    voyager_iter_joints.append(initial_trajectory)
+    neighbour_iter_joints.append(initial_trajectory)
 
     # begin optimal loops
-    while(iter_num < 300):
+    while(iter_num < total_iter_num):
         iter_num += 1
-        # generate noisy trajectory
+        # 0. generate noisy trajectory
         stomp_panda.multiDimension_diffusion()
-        # calculate weights
+        # 1.1 calculate voyager weights
+        temp_iter_traj = copy.copy(sentry.pioneer['voyager'].traj)
+        stomp_panda.multi_update(joints_traj=sentry.pioneer['voyager'].traj)
         kn_weights = stomp_panda.calculate_weights()
         n7_proved_noise = stomp_panda.calculate_delta_noise(weights_p=kn_weights)
-        # print(n7_proved_noise)
-        # get new trajectory
-        # print(iter_traj)
-        # print(n7_proved_noise[1:-1, :] * (1.0 / args.sample_frequency)**2)
-        if iter_num <= 500:
-            temp_iter_traj[1:-1, :] = iter_traj[1:-1, :] + (args.decay**iter_num) * n7_proved_noise[1:-1, :] * (1.0 / args.sample_frequency)**4 # N * 7
-        else:
-            temp_iter_traj[1:-1, :] = iter_traj[1:-1, :] + (1.0 / iter_num) * n7_proved_noise[1:-1, :] * (1.0 / args.sample_frequency)**4 # N * 7
-        # print(temp_iter_traj[1, :])
-        # limit check
+
+        # 1.2 get new trajectory
+        temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + (args.decay**iter_num) * n7_proved_noise[1:-1, :] * (1.0 / args.sample_frequency)**4 # N * 7
+        # 1.3 limit check
         if stomp_panda.multi_limit_check(temp_iter_traj):
-            # update dimensions' trajectory
-            stomp_panda.multi_update(joints_traj=temp_iter_traj)
+            # 1.4 Update Voyager
+            sentry.Update('voyager', temp_iter_traj)
+            # 1.5 Using for reuse
             if args.reuse_state:
                 stomp_panda.update_reuse_traj(generate_multi_state(temp_iter_traj, args=args))
+            # Cost voyager cost( Just for visualize )
             cost_function.Update_state(generate_multi_state(temp_iter_traj, args=args))
-            Qcost_list.append(cost_function.calculate_total_cost('kl'))
-            Qcost_total_list.append(np.sum(Qcost_list[-1]))
-            iter_traj = temp_iter_traj
-            # print(iter_traj.shape)
-            iter_joints.append(copy.copy(iter_traj))
-        # else:
-        #     args.decay = args.decay * 0.5
-        #     print(args.decay)
-    
+            voyager_Qcost_list.append(cost_function.calculate_total_cost('mse'))
+            voyager_Qcost_total_list.append(np.sum(voyager_Qcost_list[-1]))
+            # Record voyager
+            voyager_iter_joints.append(copy.copy(temp_iter_traj))
+        
+        # 2.1 calculate neighbour weights
+        temp_iter_traj = copy.copy(sentry.pioneer['neighbour'].traj)
+        stomp_panda.multi_update(joints_traj=sentry.pioneer['neighbour'].traj)
+        kn_weights = stomp_panda.calculate_weights()
+        n7_proved_noise = stomp_panda.calculate_delta_noise(weights_p=kn_weights)
+
+        # 2.2 get new trajectory
+        temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + (args.decay**iter_num) * n7_proved_noise[1:-1, :] * (1.0 / args.sample_frequency)**4 # N * 7
+        # 2.3 limit check
+        if stomp_panda.multi_limit_check(temp_iter_traj):
+            # 2.4 Update Neighbour
+            sentry.Update('neighbour', temp_iter_traj)
+            # 2.5 Using for reuse
+            if args.reuse_state:
+                stomp_panda.update_reuse_traj(generate_multi_state(temp_iter_traj, args=args))
+            # Cost voyager cost( Just for visualize )
+            cost_function.Update_state(generate_multi_state(temp_iter_traj, args=args))
+            neighbour_Qcost_list.append(cost_function.calculate_total_cost('mse'))
+            neighbour_Qcost_total_list.append(np.sum(neighbour_Qcost_list[-1]))
+            # Record voyager
+            neighbour_iter_joints.append(copy.copy(temp_iter_traj))
+        
+        # 3. Update the best
+        sentry.Update('best')
+        # 4. clock align the best and the neighbour
+        if iter_num % (total_iter_num / 10):
+            sentry.Update('clock')
+
+
+
     print("loop is over!")
     input()
-    final_traj_state = generate_multi_state(iter_traj, args)
+    final_traj_state = generate_multi_state(sentry.pioneer['best'].traj, args)
     robot.traj_torque_control(final_traj_state["position"], final_traj_state["velocity"], final_traj_state["acceleration"])
     # robot.traj_control(iter_traj)
     # print(Qcost_list)
-    Draw_cost(Qcost_total_list)
+    Draw_cost(voyager_Qcost_total_list)
+    Draw_cost(neighbour_Qcost_total_list)
 
-    end_effector = robot.solveListKinematics(iter_traj)
+    end_effector = robot.solveListKinematics(sentry.pioneer['best'].traj)
     Draw_trajectory(init_end_effector, end_effector)
     # print(end_effector.shape)
-    # print(np.array(iter_joints).shape)
     write_trajectory(end_effector[:, :3], f"{args.file_path}/results/{args.expt_name}/trajectory_logs.txt")
-    write_joints(np.array(iter_joints), f"{args.file_path}/results/{args.expt_name}/joints_logs.txt")
+    write_joints(np.array(neighbour_iter_joints), f"{args.file_path}/results/{args.expt_name}/joints_logs.txt")
 
     logfile = open(f"{args.file_path}/results/{args.expt_name}/result_logs.txt", 'w')
-    logfile.write("\n".join(str(item) for item in Qcost_list))
+    logfile.write("\n".join(str(item) for item in neighbour_Qcost_list))
     logfile.close()
 
 

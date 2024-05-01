@@ -49,7 +49,7 @@ if __name__ == '__main__':
     # robot.reset()
     # robot.traj_torque_control(demostration_state["position"], demostration_state["velocity"], demostration_state["acceleration"])
 
-    path = r'E:/Proud/franka-pybullet/src/results/0427/trajectory_logs.txt'
+    path = r'E:/Proud/franka-pybullet/src/results/0430/trajectory_logs.txt'
     traj = read_state(path)
     for i in range(len(traj)):
         traj[i] = traj[i].split()
