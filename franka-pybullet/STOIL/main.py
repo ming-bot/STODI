@@ -165,7 +165,7 @@ if __name__ == "__main__":
     parser.add_argument("--reuse-state", type=bool, default=True)
     parser.add_argument("--reuse-num", type=int, default=10)
     parser.add_argument("--K", type=int, default=20)
-    parser.add_argument("--decay", type=float, default=0.9999)
+    parser.add_argument("--decay", type=float, default=0.99)
 
     parser.add_argument("--control-frequency", type=float, default=10)
     parser.add_argument("--sample-frequency", type=float, default=20)
