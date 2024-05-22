@@ -22,11 +22,16 @@ def Generate_trajectory(N, ep, shape):
         x = np.cos(np.linspace(-2*np.pi, 2*np.pi, N))
         y = np.linspace(-2, 2, N)
         z = np.zeros(N)
+    elif shape=='rounds':
+        x = np.cos(np.linspace(-np.pi, np.pi, N))
+        y = np.sin(np.linspace(-np.pi, np.pi, N))
+        z = np.zeros(N)
     trajectory = []
     for i in range(N):
         trajectory.append([x[i], y[i], z[i]])
     trajectory = np.array(trajectory)
     noise = np.random.normal(0, ep, size=(N, 3))
+    # noise = np.random.rayleigh(scale=ep,size=(N,3))
     trajectory[1:-1] += noise[1:-1]
     return trajectory
 
@@ -120,21 +125,47 @@ def lower_filter(freq):
                 freq[i, j] = freq[i, j] / 20
     return freq
 
+def contray(N):
+    x1 = np.cos(np.linspace(-np.pi/2, np.pi/2, N))
+    y1 = np.sin(np.linspace(-np.pi/2, np.pi/2, N))
+    z1 = np.zeros(N)
+
+    x2 = -np.cos(np.linspace(-np.pi/2, np.pi/2, N))
+    y2 = np.sin(np.linspace(-np.pi/2, np.pi/2, N))
+    z2 = np.zeros(N)
+
+    trajectory1 = []
+    for i in range(N):
+        trajectory1.append([x1[i], y1[i], z1[i]])
+    trajectory1 = np.array(trajectory1)
+
+    trajectory2 = []
+    for i in range(N):
+        trajectory2.append([x2[i], y2[i], z2[i]])
+    trajectory2 = np.array(trajectory2)
+
+    fft1 = FFT(trajectory1, False)
+    fft2 = FFT(trajectory2, False)
+    fft_de = np.abs(fft1) - np.abs(fft2)
+    plt_freq(np.abs(fft_de))
+
 
 if __name__ == "__main__":
-    isshift = False
-    # trajectory1 = Generate_trajectory(128, 0.1, 'circle')
-    # trajectory1 = Generate_trajectory(128, 0.1, 'linear')
-    trajectory1 = Generate_trajectory(128, 0.1, 's-shape')
-    plt_trajectory(traj=trajectory1)
+    # isshift = False
+    # trajectory1 = Generate_trajectory(128, 0, 'circle')
+    # # trajectory1 = Generate_trajectory(128, 0.1, 'linear')
+    # # trajectory1 = Generate_trajectory(128, 0.1, 's-shape')
+    # # trajectory1 = Generate_trajectory(128, 0.1, 'rounds')
+    # plt_trajectory(traj=trajectory1)
 
-    # calculate FFT
-    trajFFT1 = FFT(trajectory1, isshift)
-    plt_freq(np.abs(trajFFT1))
+    # # calculate FFT
+    # trajFFT1 = FFT(trajectory1, isshift)
+    # plt_freq(np.abs(trajFFT1))
     # trajFFT1 = supperess_noise(trajFFT1)
-    # trajFFT1 = normization_noise(trajFFT1)
-    trajFFT1 = lower_filter(trajFFT1)
-    plt_freq(np.abs(trajFFT1))
-    trajiFFT1 = IFFT(trajFFT1, isshift)
-    print(trajiFFT1.real)
-    plt_trajectory(trajiFFT1.real)
+    # # trajFFT1 = normization_noise(trajFFT1)
+    # # trajFFT1 = lower_filter(trajFFT1)
+    # plt_freq(np.abs(trajFFT1))
+    # trajiFFT1 = IFFT(trajFFT1, isshift)
+    # print(trajiFFT1.real)
+    # plt_trajectory(trajiFFT1.real)
+    contray(128)
