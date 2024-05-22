@@ -22,9 +22,21 @@ def Generate_trajectory(N, ep, shape):
         x = np.cos(np.linspace(-2*np.pi, 2*np.pi, N))
         y = np.linspace(-2, 2, N)
         z = np.zeros(N)
-    elif shape=='rounds':
+    elif shape=='round':
         x = np.cos(np.linspace(-np.pi, np.pi, N))
         y = np.sin(np.linspace(-np.pi, np.pi, N))
+        z = np.zeros(N)
+    elif shape=='rounds':
+        x = np.cos(np.linspace(-2*np.pi, 2*np.pi, N))
+        y = np.sin(np.linspace(-2*np.pi, 2*np.pi, N))
+        z = np.linspace(0, 2, N)
+    elif shape == 'back_circle':
+        x = np.append(np.cos(np.linspace(-np.pi/2, np.pi/2, int(N/2))), np.cos(np.linspace(np.pi/2, -np.pi/2, int(N/2))))
+        y = np.append(np.sin(np.linspace(-np.pi/2, np.pi/2, int(N/2))), np.sin(np.linspace(np.pi/2, -np.pi/2, int(N/2))))
+        z = np.zeros(N)
+    elif shape == 'back_s-shape':
+        x = np.append(np.cos(np.linspace(-2*np.pi, 2*np.pi, int(N/2))), np.cos(np.linspace(2*np.pi, -2*np.pi, int(N/2))))
+        y = np.append(np.linspace(-2, 2, int(N/2)), np.linspace(2, -2, int(N/2)))
         z = np.zeros(N)
     trajectory = []
     for i in range(N):
@@ -149,23 +161,53 @@ def contray(N):
     fft_de = np.abs(fft1) - np.abs(fft2)
     plt_freq(np.abs(fft_de))
 
+def draw_trajectories(trajectory1, trajectory2):
+    fig = plt.figure()
+    ax1 = fig.add_subplot(121, projection='3d')
+    ax2 = fig.add_subplot(122, projection='3d')
+
+    ax1.scatter(trajectory1[:, 0], trajectory1[:, 1], trajectory1[:, 2])
+    ax1.set_title('Demonstration with Noise')
+    ax1.set_xlim((-2,2))
+    ax1.set_ylim((-2,2))
+    ax1.set_zlim((-2,2))
+    ax1.set_xlabel('X')
+    ax1.set_ylabel('Y')
+    ax1.set_zlabel('Z')
+
+    ax2.scatter(trajectory2[:, 0], trajectory2[:, 1], trajectory2[:, 2])
+    ax2.set_title('Optimized Trajectory')
+    ax2.set_xlim((-2,2))
+    ax2.set_ylim((-2,2))
+    ax2.set_zlim((-2,2))
+    ax2.set_xlabel('X')
+    ax2.set_ylabel('Y')
+    ax2.set_zlabel('Z')
+
+    plt.show()
 
 if __name__ == "__main__":
-    # isshift = False
+    isshift = False
     # trajectory1 = Generate_trajectory(128, 0, 'circle')
-    # # trajectory1 = Generate_trajectory(128, 0.1, 'linear')
-    # # trajectory1 = Generate_trajectory(128, 0.1, 's-shape')
-    # # trajectory1 = Generate_trajectory(128, 0.1, 'rounds')
-    # plt_trajectory(traj=trajectory1)
+    # trajectory1 = Generate_trajectory(128, 0.1, 'linear')
+    # trajectory1 = Generate_trajectory(128, 0.1, 's-shape')
+    # trajectory1 = Generate_trajectory(128, 0.1, 'round')
+    # trajectory1 = Generate_trajectory(128, 0, 'rounds')
+    # trajectory1 = Generate_trajectory(128, 0, 'back_circle')
+    trajectory1 = Generate_trajectory(128, 0.1, 'back_s-shape')
+    plt_trajectory(traj=trajectory1)
 
-    # # calculate FFT
-    # trajFFT1 = FFT(trajectory1, isshift)
-    # plt_freq(np.abs(trajFFT1))
-    # trajFFT1 = supperess_noise(trajFFT1)
-    # # trajFFT1 = normization_noise(trajFFT1)
-    # # trajFFT1 = lower_filter(trajFFT1)
-    # plt_freq(np.abs(trajFFT1))
-    # trajiFFT1 = IFFT(trajFFT1, isshift)
-    # print(trajiFFT1.real)
-    # plt_trajectory(trajiFFT1.real)
-    contray(128)
+    # calculate FFT
+    trajFFT1 = FFT(trajectory1, isshift)
+    plt_freq(np.abs(trajFFT1))
+    trajFFT1 = supperess_noise(trajFFT1)
+    # trajFFT1 = normization_noise(trajFFT1)
+    # trajFFT1 = lower_filter(trajFFT1)
+    plt_freq(np.abs(trajFFT1))
+    trajiFFT1 = IFFT(trajFFT1, isshift)
+    print(trajiFFT1.real)
+    plt_trajectory(trajiFFT1.real)
+
+    draw_trajectories(trajectory1, trajiFFT1.real)
+
+    # contray(128)
