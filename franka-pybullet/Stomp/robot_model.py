@@ -225,6 +225,14 @@ class Panda:
             # print(self.target_torque)
             time.sleep(self.stepsize)
 
+    def get_current_end_effector(self):
+        end_effector_array = np.zeros(shape=(7,))
+        link_state = p.getLinkState(self.robot, self.dof - 1)     # question1
+        end_effector_array[0: 3] = np.array(link_state[0])
+        end_effector_array[3: ] = np.array(link_state[1])
+
+        return end_effector_array
+
 # if __name__ == "__main__":
 #     robot = Panda(realtime=1)
 #     while True:

@@ -13,12 +13,15 @@ from calculate_cost import Multi_Cost
 import copy
 import matplotlib.pyplot as plt
 from generate_initial_traj import *
-from visualization import Draw_trajectory
+from visualization import Draw_trajectory, Draw_3trajectory
 
 def Draw_cost(cost_list):
     x = np.linspace(0, 1, len(cost_list))
     y = cost_list
     plt.plot(x, y, linewidth=1)
+    plt.xlabel('Optimized processes (%)')
+    plt.ylabel('Cost function value')
+    plt.title('Stoil Optimization')
     plt.show()
 
 
@@ -46,6 +49,11 @@ def main(args):
 
     # 1. initial stomp
     robot = Panda()
+    # eff = Generate_effector_trajectory(128, 0, 'linear', [0, 0, 0, -1.6, 0, 1.87, 0], [0, -0.7, 0, -1.6, 0, 3.5, 0.7], robot)
+    # initial_trajectory = Joint_linear_initial(begin=[0, 0, 0, -1.6, 0, 1.87, 0], end=[0, -0.7, 0, -1.6, 0, 3.5, 0.7])
+    # demostrantion = Generate_demonstration_from_effector(eff, robot)
+    # print(initial_trajectory.shape, demostrantion.shape)
+
     init_end_effector = robot.solveListKinematics(initial_trajectory)
     # Cost Function
     cost_function = Multi_Cost(panda=robot, init_trajectory=demostrantion, args=args)
@@ -70,9 +78,9 @@ def main(args):
 
     # 计算Cost标准步骤(for example)
     cost_function.Update_state(generate_multi_state(initial_trajectory, args=args))
-    voyager_Qcost_list.append(cost_function.calculate_total_cost('mse'))
+    voyager_Qcost_list.append(cost_function.calculate_total_cost('dtw'))
     voyager_Qcost_total_list.append(np.sum(voyager_Qcost_list[-1]))
-    neighbour_Qcost_list.append(cost_function.calculate_total_cost('mse'))
+    neighbour_Qcost_list.append(cost_function.calculate_total_cost('dtw'))
     neighbour_Qcost_total_list.append(np.sum(neighbour_Qcost_list[-1]))
 
     voyager_iter_joints.append(initial_trajectory)
@@ -100,7 +108,7 @@ def main(args):
                 stomp_panda.update_reuse_traj(generate_multi_state(temp_iter_traj, args=args))
             # Cost voyager cost( Just for visualize )
             cost_function.Update_state(generate_multi_state(temp_iter_traj, args=args))
-            voyager_Qcost_list.append(cost_function.calculate_total_cost('mse'))
+            voyager_Qcost_list.append(cost_function.calculate_total_cost('dtw'))
             voyager_Qcost_total_list.append(np.sum(voyager_Qcost_list[-1]))
             # Record voyager
             voyager_iter_joints.append(copy.copy(temp_iter_traj))
@@ -122,7 +130,7 @@ def main(args):
                 stomp_panda.update_reuse_traj(generate_multi_state(temp_iter_traj, args=args))
             # Cost voyager cost( Just for visualize )
             cost_function.Update_state(generate_multi_state(temp_iter_traj, args=args))
-            neighbour_Qcost_list.append(cost_function.calculate_total_cost('mse'))
+            neighbour_Qcost_list.append(cost_function.calculate_total_cost('dtw'))
             neighbour_Qcost_total_list.append(np.sum(neighbour_Qcost_list[-1]))
             # Record voyager
             neighbour_iter_joints.append(copy.copy(temp_iter_traj))
@@ -145,7 +153,8 @@ def main(args):
     Draw_cost(neighbour_Qcost_total_list)
 
     end_effector = robot.solveListKinematics(sentry.pioneer['best'].traj)
-    Draw_trajectory(init_end_effector, end_effector)
+    eff = np.array(robot.solveListKinematics(demostrantion))
+    Draw_3trajectory(init_end_effector, end_effector, eff)
     # print(end_effector.shape)
     write_trajectory(end_effector[:, :3], f"{args.file_path}/results/{args.expt_name}/trajectory_logs.txt")
     write_joints(np.array(neighbour_iter_joints), f"{args.file_path}/results/{args.expt_name}/joints_logs.txt")

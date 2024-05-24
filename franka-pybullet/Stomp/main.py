@@ -12,12 +12,15 @@ from calculate_cost import Multi_Cost
 import copy
 import matplotlib.pyplot as plt
 from generate_initial_traj import *
-from visualization import Draw_trajectory
+from visualization import Draw_trajectory, Draw_3trajectory
 
 def Draw_cost(cost_list):
     x = np.linspace(0, 1, len(cost_list))
     y = cost_list
     plt.plot(x, y, linewidth=1)
+    plt.xlabel('Optimized processes (%)')
+    plt.ylabel('Cost function value')
+    plt.title('Stomp Optimization')
     plt.show()
 
 def generate_multi_state(n7_trajectory, args):
@@ -54,7 +57,11 @@ def main(args):
 
     # 1. initial stomp
     robot = Panda()
-    # robot.setControlMode("position")
+    # eff = Generate_effector_trajectory(128, 0, 'linear', [0, 0, 0, -1.6, 0, 1.87, 0], [0, -0.7, 0, -1.6, 0, 3.5, 0.7], robot)
+    # initial_trajectory = Joint_linear_initial(begin=[0, 0, 0, -1.6, 0, 1.87, 0], end=[0, -0.7, 0, -1.6, 0, 3.5, 0.7])
+    # demostrantion = Generate_demonstration_from_effector(eff, robot)
+    # print(initial_trajectory.shape, demostrantion.shape)
+
     init_end_effector = robot.solveListKinematics(initial_trajectory)
     cost_function = Multi_Cost(panda=robot, init_trajectory=demostrantion, args=args)
     stomp_panda = Multi_dimensions_stomp(num_points=initial_trajectory.shape[0], args=args, cost_func=cost_function, 
@@ -70,7 +77,7 @@ def main(args):
     iter_num = 0
 
     cost_function.Update_state(generate_multi_state(initial_trajectory, args=args))
-    Qcost_list.append(cost_function.calculate_total_cost('kl'))
+    Qcost_list.append(cost_function.calculate_total_cost('dtw'))
 
     iter_traj = copy.copy(initial_trajectory)
     temp_iter_traj = copy.copy(initial_trajectory)
@@ -101,7 +108,7 @@ def main(args):
             if args.reuse_state:
                 stomp_panda.update_reuse_traj(generate_multi_state(temp_iter_traj, args=args))
             cost_function.Update_state(generate_multi_state(temp_iter_traj, args=args))
-            Qcost_list.append(cost_function.calculate_total_cost('kl'))
+            Qcost_list.append(cost_function.calculate_total_cost('dtw'))
             Qcost_total_list.append(np.sum(Qcost_list[-1]))
             iter_traj = temp_iter_traj
             # print(iter_traj.shape)
@@ -119,7 +126,8 @@ def main(args):
     Draw_cost(Qcost_total_list)
 
     end_effector = robot.solveListKinematics(iter_traj)
-    Draw_trajectory(init_end_effector, end_effector)
+    eff = np.array(robot.solveListKinematics(demostrantion))
+    Draw_3trajectory(init_end_effector, end_effector, eff)
     # print(end_effector.shape)
     # print(np.array(iter_joints).shape)
     write_trajectory(end_effector[:, :3], f"{args.file_path}/results/{args.expt_name}/trajectory_logs.txt")
@@ -140,7 +148,7 @@ if __name__ == "__main__":
     parser.add_argument("--reuse-state", type=bool, default=True)
     parser.add_argument("--reuse-num", type=int, default=10)
     parser.add_argument("--K", type=int, default=20)
-    parser.add_argument("--decay", type=float, default=0.9999)
+    parser.add_argument("--decay", type=float, default=0.99)
 
     parser.add_argument("--control-frequency", type=float, default=10)
     parser.add_argument("--sample-frequency", type=float, default=20)
