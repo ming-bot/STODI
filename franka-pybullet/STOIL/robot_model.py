@@ -28,25 +28,25 @@ class Panda:
 
         # # example 1：机械臂在地面上
         # # load models
-        # p.setAdditionalSearchPath("../models")
-        # self.plane = p.loadURDF("plane/plane.urdf", useFixedBase=True)
-        # p.changeDynamics(self.plane, -1, restitution=.95)
-        # self.robot = p.loadURDF("panda/panda.urdf", useFixedBase=True, flags=p.URDF_USE_SELF_COLLISION)
-
-        # example 2：机械臂和小方块、小圆球在桌上
-        # load models
         p.setAdditionalSearchPath("../models")
         self.plane = p.loadURDF("plane/plane.urdf", useFixedBase=True)
         p.changeDynamics(self.plane, -1, restitution=.95)
-        self.robot = p.loadURDF("panda/panda.urdf", basePosition=[0.00000, -0.200000, 1.200000], baseOrientation=[0.000000, 0.000000,
-                             0.000000, 1.000000], useFixedBase=True, flags=p.URDF_USE_SELF_COLLISION)
-        self.ball_1 = p.loadURDF("ball/ball.urdf", basePosition=[0.9, -0.2, 1.3], globalScaling=1)
+        self.robot = p.loadURDF("panda/panda.urdf", useFixedBase=True, flags=p.URDF_USE_SELF_COLLISION)
 
-        # load other models
-        p.setAdditionalSearchPath(pybullet_data.getDataPath())
-        self.table_1 = p.loadURDF("table/table.urdf", basePosition=[0.5, -0.2, 0.0],
-                                  baseOrientation=[0, 0, 1, 0], globalScaling=2)
-        self.cube_1 = p.loadURDF("cube.urdf", basePosition=[0.7, -0.2, 1.3], globalScaling=0.10)
+        # example 2：机械臂和小方块、小圆球在桌上
+        # load models
+        # p.setAdditionalSearchPath("../models")
+        # self.plane = p.loadURDF("plane/plane.urdf", useFixedBase=True)
+        # p.changeDynamics(self.plane, -1, restitution=.95)
+        # self.robot = p.loadURDF("panda/panda.urdf", basePosition=[0.00000, -0.200000, 1.200000], baseOrientation=[0.000000, 0.000000,
+        #                      0.000000, 1.000000], useFixedBase=True, flags=p.URDF_USE_SELF_COLLISION)
+        # self.ball_1 = p.loadURDF("ball/ball.urdf", basePosition=[0.9, -0.2, 1.3], globalScaling=1)
+
+        # # load other models
+        # p.setAdditionalSearchPath(pybullet_data.getDataPath())
+        # self.table_1 = p.loadURDF("table/table.urdf", basePosition=[0.5, -0.2, 0.0],
+        #                           baseOrientation=[0, 0, 1, 0], globalScaling=2)
+        # self.cube_1 = p.loadURDF("cube.urdf", basePosition=[0.7, -0.2, 1.3], globalScaling=0.10)
 
         # robot parameters
         self.dof = p.getNumJoints(self.robot) - 1

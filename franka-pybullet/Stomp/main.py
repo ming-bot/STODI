@@ -123,7 +123,8 @@ def main(args):
     robot.traj_torque_control(final_traj_state["position"], final_traj_state["velocity"], final_traj_state["acceleration"])
     # robot.traj_control(iter_traj)
     # print(Qcost_list)
-    Draw_cost(Qcost_total_list)
+    # Draw_cost(Qcost_total_list)
+    Draw_cost(list(np.array(Qcost_list)[:,1]))
 
     end_effector = robot.solveListKinematics(iter_traj)
     eff = np.array(robot.solveListKinematics(demostrantion))
