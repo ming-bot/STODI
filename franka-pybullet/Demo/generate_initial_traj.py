@@ -11,7 +11,7 @@ def Joint_linear_initial(begin, end):
     return initial_trajectory
 
 def Generate_demonstration(begin, end):
-    external = np.array([-0.3948859155257995, -0.7270775750246515, 0.9705156650028227, -1.7756625474152135, -0.2109975244307001, 2.7461024636268965, 1.071975144388428])
+    external = np.array([-0.3948859155257995, -0.7270775750246515, 2.1705156650028227, -1.7756625474152135, -0.2109975244307001, 2.7461024636268965, 1.071975144388428])
     begin = np.array(begin)
     end = np.array(end)
     points_num = 256
