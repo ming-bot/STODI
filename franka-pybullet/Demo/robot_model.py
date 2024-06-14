@@ -32,7 +32,7 @@ class Panda:
         self.plane = p.loadURDF("plane/plane.urdf", useFixedBase=True)
         p.changeDynamics(self.plane, -1, restitution=.95)
         self.robot = p.loadURDF("panda/panda.urdf", useFixedBase=True, flags=p.URDF_USE_SELF_COLLISION)
-        self.ball_1 = p.loadURDF("ball/ball.urdf", basePosition=[0.9, -0.2, 1.3], globalScaling=1)
+        self.ball_1 = p.loadURDF("ball/ball.urdf", basePosition=[0.47, -0.1, 0.05], globalScaling=1)
 
         # example 2：机械臂和小方块、小圆球在桌上
         # load models
@@ -76,7 +76,7 @@ class Panda:
 
         # 调整初始摄像头视角
         # camera parameters：摄像头到目标位置的距离，摄像头的偏航角（水平旋转角度），摄像头的仰角（垂直旋转角度），摄像头的目标位置，即摄像头对准的点的坐标
-        p.resetDebugVisualizerCamera(cameraDistance=4, cameraYaw=30, cameraPitch=-30, cameraTargetPosition=[0, 0, 0])
+        p.resetDebugVisualizerCamera(cameraDistance=1.3, cameraYaw=60, cameraPitch=-10, cameraTargetPosition=[0, 0, 0.5])
 
         self.reset()
 
@@ -245,7 +245,7 @@ class Panda:
         return end_effector_array
 
     # 0603 update
-    def disconnet(self):
+    def disconnect(self):
         p.disconnect()
 
     def demo_mode(self):  # 记录 demo 时，重力设置为0；启用实时仿真；设置关节阻尼

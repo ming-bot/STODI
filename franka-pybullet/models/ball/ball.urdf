@@ -12,14 +12,14 @@
       <!-- visual origin is defined w.r.t. link local coordinate system -->
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <sphere radius="0.02"/>
+        <sphere radius="0.04"/>
       </geometry>
     </visual>
     <collision>
       <!-- collision origin is defined w.r.t. link local coordinate system -->
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <sphere radius="0.02"/>
+        <sphere radius="0.04"/>
       </geometry>
     </collision>
   </link>

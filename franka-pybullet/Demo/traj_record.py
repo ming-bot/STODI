@@ -1,7 +1,7 @@
 # 依赖于 robot_model.py
 # 记录机器人的轨迹数据
 import sys
-sys.path.append(r'C:/Users/hp/PycharmProjects/trajOptimize/franka-pybullet/src')
+sys.path.append(r'E:/Proud/franka-pybullet/src')
 
 from robot_model import Panda
 import time
@@ -39,7 +39,7 @@ try:
 
 except KeyboardInterrupt:
     # 保存记录的数据到文件
-    with open(r'C:/Users/hp/PycharmProjects/trajOptimize/franka-pybullet/src/results/0530/aaa.json', 'w') as f:
+    with open(r'E:/Proud/franka-pybullet/Demo/trajectories/aaa.json', 'w') as f:
         json.dump(trajectory_data, f, indent=4)
     print("Trajectory data has been saved to 'aaa.json'")
 

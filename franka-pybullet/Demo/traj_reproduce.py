@@ -1,6 +1,7 @@
 # 根据记录的 .json 文件，重新生成轨迹
 import sys
-sys.path.append(r'C:/Users/hp/PycharmProjects/trajOptimize/franka-pybullet/src')
+# sys.path.append(r'C:/Users/hp/PycharmProjects/trajOptimize/franka-pybullet/src')
+sys.path.append(r'E:/Proud/franka-pybullet/src')
 
 import argparse
 from sentry import Sentry, generate_multi_state
@@ -13,7 +14,8 @@ if __name__ == "__main__":
     robot = Panda()
     parser = argparse.ArgumentParser()
     parser.add_argument("--file-path", type=str,
-                        default=r'C:/Users/hp/PycharmProjects/trajOptimize/franka-pybullet/src')
+                        # default=r'C:/Users/hp/PycharmProjects/trajOptimize/franka-pybullet/src')
+                        default=r'E:/Proud/franka-pybullet/src')
     parser.add_argument("--expt-name", type=str, default=7) # required=True)
 
     parser.add_argument("--dimension", type=int, default=7)
@@ -27,7 +29,7 @@ if __name__ == "__main__":
     parser.add_argument("--sample-frequency", type=float, default=20)
 
     args = parser.parse_args()
-    print(robot)
+    # print(robot)
     # # 生成初始轨迹
     # initial_trajectory = Joint_linear_initial(begin=[0, -0.7, 0, -1.6, 0, 3.5, 0.7], end=[0.17, 1.58, -0.52, -0.46, -0.25, 2.17, 0])
     #
@@ -36,7 +38,7 @@ if __name__ == "__main__":
     #                           initial_traj_state["acceleration"])
 
     # 读取记录的轨迹
-    with open(r'C:/Users/hp/PycharmProjects/trajOptimize/franka-pybullet/src/results/0530/aaa.json', 'r') as fcc_file:
+    with open(r'E:/Proud/franka-pybullet/Demo/trajectories/trajectory_logs.json', 'r') as fcc_file:
         fcc_data = json.load(fcc_file)
     demo_trajectory = []
 

@@ -14,6 +14,7 @@ import copy
 import matplotlib.pyplot as plt
 from generate_initial_traj import *
 from visualization import Draw_trajectory, Draw_3trajectory
+import json
 
 def Draw_cost(cost_list):
     x = np.linspace(0, 1, len(cost_list))
@@ -41,11 +42,22 @@ def write_joints(item, path):
         traj_logfile.write("\n")
     traj_logfile.close()
 
+def write_as_json(state, path):
+    state['position'] = state['position'].tolist()
+    state['velocity'] = state['velocity'].tolist()
+    state['acceleration'] = state['acceleration'].tolist()
+    with open(path, 'w') as f:
+        json.dump(state, f, indent=4)
+    print("Trajectory data has been saved to 'trajectory_logs.json'")
+
+
 def main(args):
     # 0. input initial trajectory; trajectory should be np.array((N * 7))
-    initial_trajectory = Joint_linear_initial(begin=[0, 0, 0, -1.6, 0, 1.87, 0], end=[0, -0.7, 0, -1.6, 0, 3.5, 0.7])
+    begin_point_angle = [0, -0.7, 0, -1.6, 0, 3.5, 0.7]
+    end_point_angle = [0, 0.7400680720850216, 0, -2.3715621552883, 0, 3.2865297305070262, 0.7]
+    initial_trajectory = Joint_linear_initial(begin=begin_point_angle, end=end_point_angle)
     # 想要模仿的Demonstration
-    demostrantion = Generate_demonstration(begin=[0, 0, 0, -1.6, 0, 1.87, 0], end=[0, -0.7, 0, -1.6, 0, 3.5, 0.7])
+    demostrantion = Generate_demonstration(begin=begin_point_angle, end=end_point_angle)
 
     # 1. initial stomp
     robot = Panda()
@@ -157,7 +169,9 @@ def main(args):
     Draw_3trajectory(init_end_effector, end_effector, eff)
     # print(end_effector.shape)
     write_trajectory(end_effector[:, :3], f"{args.file_path}/results/{args.expt_name}/trajectory_logs.txt")
-    write_joints(np.array(neighbour_iter_joints), f"{args.file_path}/results/{args.expt_name}/joints_logs.txt")
+    # write_joints(np.array(neighbour_iter_joints), f"{args.file_path}/results/{args.expt_name}/joints_logs.txt")
+    write_as_json(final_traj_state, f"{args.file_path}/results/{args.expt_name}/joints_logs.json")
+
 
     logfile = open(f"{args.file_path}/results/{args.expt_name}/result_logs.txt", 'w')
     logfile.write("\n".join(str(item) for item in neighbour_Qcost_list))

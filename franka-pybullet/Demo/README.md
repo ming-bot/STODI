@@ -1,10 +1,7 @@
-# STOIL
+# How to use the arm to play golf:golf:
 
-## Install
+In this folder, we can teach the arm how to play golf.:golf:
 
-```
-pip install pybullet, numpy
-```
+:blush:if you are a technical programmer, you can change the ball position and the demonstration from the code directly. The "generate_initial_traj"  code file contains the code for generating demonstration and the "robot_model.py"  code file contains the code for all models used in pybullet. Enjoy your teaching time!:heart_eyes:
 
-You may occur error message : error: Microsoft Visual C++ 14.0 or greater is required. Get it with "Microsoft C++ Build Tools": https://visualstudio.microsoft.com/visual-cpp-build-tools/
-      [end of output], then go to the website mentioned above and download VStudio
+:yum:If you are not good at coding, we also prepare a plan B for you to enjoy the project. You can use the code file "traj_record.py"​ to teach the arm hand-by-hand by using your mouse to drag it.

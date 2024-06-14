@@ -1,26 +1,30 @@
 import numpy as np
 
+# 在关节空间直接连接起点和终点，函数输入：起点和终点的关节角度list
 def Joint_linear_initial(begin, end):
     # begin point should be 1 * 7, the same with end point
     begin = np.array(begin)
     end = np.array(end)
-    points_num = 256
+    points_num = 128
     initial_trajectory = np.zeros(shape=(points_num, 7))
     for i in range(points_num):
         initial_trajectory[i, :] = begin + (end - begin) * float(i)  / (points_num - 1)
     return initial_trajectory
 
+# 函数输入同上，设置一个确定的中间点姿态，形成demonstration
 def Generate_demonstration(begin, end):
-    external = np.array([-0.3948859155257995, -0.7270775750246515, 2.1705156650028227, -1.7756625474152135, -0.2109975244307001, 2.7461024636268965, 1.071975144388428])
+    # external = np.array([-0.3948859155257995, -0.7270775750246515, 0.9705156650028227, -1.7756625474152135, -0.2109975244307001, 2.7461024636268965, 1.071975144388428])
+    external = np.array([0.19707245744190005, 0.41306139234248196, 0.49338602049678143, -2.7335761492156956, -0.11356603419960899, 3.286082730874086, 0.7])
     begin = np.array(begin)
     end = np.array(end)
-    points_num = 256
+    points_num = 64
     initial_trajectory = np.zeros(shape=(2 * points_num, 7))
     for i in range(points_num):
         initial_trajectory[i, :] = begin + (external - begin) * float(i)  / (points_num - 1)
         initial_trajectory[i + points_num, :] = external + (end - external) * float(i)  / (points_num - 1)
     return initial_trajectory
 
+# 从末端执行器欧式空间轨迹得到关节空间轨迹
 def Generate_demonstration_from_effector(effector_trajectory, robot):
     effector_trajectory = np.array(effector_trajectory)
     N = effector_trajectory.shape[0]
@@ -38,6 +42,7 @@ def Generate_demonstration_from_effector(effector_trajectory, robot):
             raise Exception('wrong joint trajectory: number of joints is not 7')
     return np.array(joints_list)
 
+# 获取一些末端执行器在欧氏空间的轨迹（配合上个函数使用
 def Generate_effector_trajectory(N, ep, shape, begin, inter, robot):
     temp = np.stack([np.array(begin),np.array(inter)], axis=0)
     print(temp.shape)
@@ -58,6 +63,7 @@ def Generate_effector_trajectory(N, ep, shape, begin, inter, robot):
     trajectory[1:-1] += noise[1:-1]
     return trajectory
 
+# 获取一些三维圆周的list
 def generate_circle_points(point1, point2, num_points):
     center = (point1 + point2) / 2
     radius = np.linalg.norm(point1 - point2) / 2
