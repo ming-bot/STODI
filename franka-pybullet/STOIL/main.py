@@ -1,5 +1,5 @@
 import sys
-sys.path.append(r'E:/Proud/franka-pybullet/src')
+sys.path.append(r'G:/Proud/franka-pybullet/src')
 
 import argparse
 import os
@@ -78,9 +78,9 @@ def main(args):
 
     # 计算Cost标准步骤(for example)
     cost_function.Update_state(generate_multi_state(initial_trajectory, args=args))
-    voyager_Qcost_list.append(cost_function.calculate_total_cost('dtw'))
+    voyager_Qcost_list.append(cost_function.calculate_total_cost('mse'))
     voyager_Qcost_total_list.append(np.sum(voyager_Qcost_list[-1]))
-    neighbour_Qcost_list.append(cost_function.calculate_total_cost('dtw'))
+    neighbour_Qcost_list.append(cost_function.calculate_total_cost('mse'))
     neighbour_Qcost_total_list.append(np.sum(neighbour_Qcost_list[-1]))
 
     voyager_iter_joints.append(initial_trajectory)
@@ -108,7 +108,7 @@ def main(args):
                 stomp_panda.update_reuse_traj(generate_multi_state(temp_iter_traj, args=args))
             # Cost voyager cost( Just for visualize )
             cost_function.Update_state(generate_multi_state(temp_iter_traj, args=args))
-            voyager_Qcost_list.append(cost_function.calculate_total_cost('dtw'))
+            voyager_Qcost_list.append(cost_function.calculate_total_cost('mse'))
             voyager_Qcost_total_list.append(np.sum(voyager_Qcost_list[-1]))
             # Record voyager
             voyager_iter_joints.append(copy.copy(temp_iter_traj))
@@ -130,7 +130,7 @@ def main(args):
                 stomp_panda.update_reuse_traj(generate_multi_state(temp_iter_traj, args=args))
             # Cost voyager cost( Just for visualize )
             cost_function.Update_state(generate_multi_state(temp_iter_traj, args=args))
-            neighbour_Qcost_list.append(cost_function.calculate_total_cost('dtw'))
+            neighbour_Qcost_list.append(cost_function.calculate_total_cost('mse'))
             neighbour_Qcost_total_list.append(np.sum(neighbour_Qcost_list[-1]))
             # Record voyager
             neighbour_iter_joints.append(copy.copy(temp_iter_traj))
@@ -168,7 +168,7 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--file-path", type=str, default=r'E:/Proud/franka-pybullet/src')
+    parser.add_argument("--file-path", type=str, default=r'G:/Proud/franka-pybullet/src')
     parser.add_argument("--expt-name", type=str, required=True)
 
     parser.add_argument("--dimension", type=int, default=7)

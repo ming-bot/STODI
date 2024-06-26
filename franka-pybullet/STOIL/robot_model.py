@@ -82,9 +82,8 @@ class Panda:
     def reset(self):
         self.t = 0.0
         self.control_mode = "torque"
-        # self.target_pos = [0., 0., 0., -1.6, 0., 1.87, 0.]    # 低
+        self.target_pos = [0., 0., 0., -1.6, 0., 1.87, 0.]    # 低
         # self.target_pos = [0., -0.7, 0.0, -1.6, 0., 3.5, 0.7]  # 高 new
-        self.target_pos = [0, -0.7, 0, -1.6, 0, 3.5, 0.7]
         for j in range(self.dof):
             self.target_torque[j] = 0.
             p.resetJointState(self.robot, j, targetValue=self.target_pos[j])
