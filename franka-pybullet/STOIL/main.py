@@ -78,9 +78,9 @@ def main(args):
 
     # 计算Cost标准步骤(for example)
     cost_function.Update_state(generate_multi_state(initial_trajectory, args=args))
-    voyager_Qcost_list.append(cost_function.calculate_total_cost('mse'))
+    voyager_Qcost_list.append(cost_function.calculate_total_cost('omse'))
     voyager_Qcost_total_list.append(np.sum(voyager_Qcost_list[-1]))
-    neighbour_Qcost_list.append(cost_function.calculate_total_cost('mse'))
+    neighbour_Qcost_list.append(cost_function.calculate_total_cost('omse'))
     neighbour_Qcost_total_list.append(np.sum(neighbour_Qcost_list[-1]))
 
     voyager_iter_joints.append(initial_trajectory)
@@ -108,7 +108,7 @@ def main(args):
                 stomp_panda.update_reuse_traj(generate_multi_state(temp_iter_traj, args=args))
             # Cost voyager cost( Just for visualize )
             cost_function.Update_state(generate_multi_state(temp_iter_traj, args=args))
-            voyager_Qcost_list.append(cost_function.calculate_total_cost('mse'))
+            voyager_Qcost_list.append(cost_function.calculate_total_cost('omse'))
             voyager_Qcost_total_list.append(np.sum(voyager_Qcost_list[-1]))
             # Record voyager
             voyager_iter_joints.append(copy.copy(temp_iter_traj))
@@ -120,7 +120,8 @@ def main(args):
         n7_proved_noise = stomp_panda.calculate_delta_noise(weights_p=kn_weights)
 
         # 2.2 get new trajectory
-        temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + (args.decay**iter_num) * n7_proved_noise[1:-1, :] * (1.0 / args.sample_frequency)**4 # N * 7
+        # temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + (args.decay**iter_num) * n7_proved_noise[1:-1, :] * (1.0 / args.sample_frequency)**4 # N * 7
+        temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + n7_proved_noise[1:-1, :] * (1.0 / args.sample_frequency)**4 # N * 7
         # 2.3 limit check
         if stomp_panda.multi_limit_check(temp_iter_traj):
             # 2.4 Update Neighbour
@@ -130,7 +131,7 @@ def main(args):
                 stomp_panda.update_reuse_traj(generate_multi_state(temp_iter_traj, args=args))
             # Cost voyager cost( Just for visualize )
             cost_function.Update_state(generate_multi_state(temp_iter_traj, args=args))
-            neighbour_Qcost_list.append(cost_function.calculate_total_cost('mse'))
+            neighbour_Qcost_list.append(cost_function.calculate_total_cost('omse'))
             neighbour_Qcost_total_list.append(np.sum(neighbour_Qcost_list[-1]))
             # Record voyager
             neighbour_iter_joints.append(copy.copy(temp_iter_traj))

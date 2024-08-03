@@ -233,10 +233,11 @@ class Panda:
 
         return end_effector_array
 
-# if __name__ == "__main__":
-#     robot = Panda(realtime=1)
-#     while True:
-#         pass
+if __name__ == "__main__":
+    robot = Panda(realtime=1)
+    while True:
+        robot.reset()
+        pass
 
 
 
