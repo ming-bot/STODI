@@ -51,3 +51,9 @@ You can replace the `'your expert name'` with what you want. The result files wi
 ## 3. Other files
 
 Other files in the folders (`Proud_hp, scripts`) are not important or under development. Future work might focus on employing the STODI into the ROS platform, so stay tuned!
+
+The `src` folder contains images and some other supplementary materials for our paper.
+
+
+
+This project is licensed under the MIT license.
