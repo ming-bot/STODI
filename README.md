@@ -1,48 +1,53 @@
-# Proud: Professional Robot On Utilizing Dice
-明宝science robotics作品
+# Stochastic Trajectory Optimization for Demonstration Imitation（STODI）
 
-### 2024/1/11 更新记录
+## 1. The Folder structure:
 
-更新了一个python脚本，实现了通过预设的轨迹和move_group进行机械臂的轨迹追踪控制。详情请见内部Record。
+Main code files are stored in the **franka-pybullet** folder, which includes:
+
+**Demo**: Mainly responsible for the presentation of the experimental part of the paper;
+
+**model**: Back up some model information;
+
+**src**: Record experimental results, etc.
+
+**STODI**: Mainly thesis algorithms;
+
+**Stomp**: The main improved Stomp algorithm;
+
+**SpectrumAnalysis**: Some analysis for denoising methods.
 
 
 
-### 2024/1/15 问题建模
+## 2. How to use STODI in the pybullet simulator
 
+Firstly, the main simulation environment package is pybullet, you should install pybullet in your environment.
+
+### 2.1  Run the code mentioned in the paper
+
+If you want to run the **improved Stomp algorithm**, you can run this in your command:
+
+```python
+python ./Stomp/main.py --expt-name='your expert name'
 ```
-Input: reference_trajectory
-output: optimized_trajectory
-optimize target: theta
 
-temp_trajectory <—— reference_trajectory
-OUTER_LOOP{
-	
+You can replace the `'your expert name'` with what you want. The result files will be written in the `./src/results/` folder.
 
 
-}
 
+If you want to run the **STODI algorithm**, you can run this in your command:
+
+```python
+python ./STODI/main.py --expt-name='your expert name'
 ```
 
-insight是，类似于模仿学习，为了完成某一任务（可以简单转化为优化theta<某一个机械臂的运动特性>），人类给出了一条参考的轨迹reference_trajectory，但其实最优的轨迹可能并不完全等价于此时的参考轨迹，而是参考轨迹可以看作是最优轨迹的邻域中采样出的一个轨迹。此时优化的目标即通过优化theta，找出最优轨迹；同时保留机械臂运动的连续性等特点。
+You can replace the `'your expert name'` with what you want. The result files will be written in the `./src/results/` folder.
 
-同时如果我们还需要对参考轨迹进行评估，最终的优化轨迹和参考轨迹相似度？参考轨迹是否合理？
 
-------
 
-### 2024/6/13
+**Important Notion:** You may need to change the file path argument if your path is different with `E:/STODI/franka-pybullet` .
 
-新添加了Demo文件夹，目前架构如下所示：
 
-代码集中在franka-pybullet下，包括：
 
-**Demo**：主要负责论文实验部分的展示；
+## 3. Other files
 
-**model**：备份一些模型信息；
-
-**example**：不用管，是原始pybullet示例自带的；
-
-**src**：记录实验结果等等；
-
-**Stoil**：主要是论文算法；
-
-**Stomp**：主要改进过的Stomp算法；
+Other files in the folders (`Proud_hp, scripts`) are not important or under development. Future work might focus on employing the STODI into the ROS platform, so stay tuned!

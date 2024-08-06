@@ -1,5 +1,5 @@
 import sys
-sys.path.append(r'E:/STOIL/src/franka-pybullet/src')
+sys.path.append(r'E:/STODI/src/franka-pybullet/src')
 import argparse
 # import pybullet as p
 import time
@@ -19,7 +19,7 @@ def read_state(path):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--file-path", type=str, default=r'E:/STOIL/src/franka-pybullet/src')
+    parser.add_argument("--file-path", type=str, default=r'E:/STODI/src/franka-pybullet/src')
 
     parser.add_argument("--dimension", type=int, default=7)
     parser.add_argument("--add-contourCost", type=bool, default=False)
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     # robot.reset()
     # robot.traj_torque_control(demostration_state["position"], demostration_state["velocity"], demostration_state["acceleration"])
 
-    path = r'E:/Proud/franka-pybullet/src/results/0606stomp/trajectory_logs.txt'
+    path = r'E:/STODI/franka-pybullet/src/results/0606stomp/trajectory_logs.txt'
     traj = read_state(path)
     for i in range(len(traj)):
         traj[i] = traj[i].split()

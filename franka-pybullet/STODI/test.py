@@ -1,5 +1,5 @@
 import sys
-sys.path.append(r'G:/Proud/franka-pybullet/src')
+sys.path.append(r'G:/STODI/franka-pybullet/src')
 import argparse
 # import pybullet as p
 import time
@@ -20,7 +20,7 @@ def read_state(path):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--file-path", type=str, default=r'G:/Proud/franka-pybullet/src')
+    parser.add_argument("--file-path", type=str, default=r'G:/STODI/franka-pybullet/src')
 
     parser.add_argument("--dimension", type=int, default=7)
     parser.add_argument("--add-contourCost", type=bool, default=False)
@@ -68,9 +68,9 @@ if __name__ == '__main__':
     
     # 最终的实验需要将图进行合并，所以有了下面的石山
     # 读取优化后的三维轨迹
-    # path_list = [r'./src/results/0606stomp', r'./src/results/060602stomp', r'./src/results/0606stoil']
+    path_list = [r'./src/results/0606stomp', r'./src/results/060602stomp', r'./src/results/0606stoil']
     # path_list = [r'./src/results/0606stomp', r'./src/results/0710', r'./src/results/0710omse']
-    path_list = [r'./src/results/0619mseA', r'./src/results/0619mseB', r'./src/results/0606stoil']
+    # path_list = [r'./src/results/0619mseA', r'./src/results/0619mseB', r'./src/results/0606stoil']
     traj_list = []
     cost_list = []
     for path in path_list:
