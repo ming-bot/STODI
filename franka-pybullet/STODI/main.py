@@ -169,7 +169,7 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--file-path", type=str, default=r'G:/STODI/franka-pybullet/src')
+    parser.add_argument("--file-path", type=str, default=r'E:/STODI/franka-pybullet/src')
     parser.add_argument("--expt-name", type=str, required=True)
 
     parser.add_argument("--dimension", type=int, default=7)

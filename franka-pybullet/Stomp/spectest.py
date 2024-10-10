@@ -1,5 +1,5 @@
 import sys
-sys.path.append(r'E:/STOIL/src/franka-pybullet/src')
+sys.path.append(r'E:/STODI/src/franka-pybullet/src')
 import argparse
 # import pybullet as p
 import time
@@ -25,7 +25,7 @@ def read_state(path):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--file-path", type=str, default=r'E:/STOIL/src/franka-pybullet/src')
+    parser.add_argument("--file-path", type=str, default=r'E:/STODI/src/franka-pybullet/src')
 
     parser.add_argument("--dimension", type=int, default=7)
     parser.add_argument("--add-contourCost", type=bool, default=False)
