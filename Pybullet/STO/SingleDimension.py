@@ -95,24 +95,24 @@ class single_dimension_stomp():
         max_position = np.max(state["position"])
         min_position = np.min(state["position"])
         if max_position > self.range_limit[1] or min_position < self.range_limit[0]:
-            print(max_position ,min_position)
-            print("Position exceed limit!\n")
+            # print(max_position ,min_position)
+            # print("Position exceed limit!\n")
             return False
 
         # velocity check
         max_velocity = np.max(state["velocity"])
         min_velocity = np.min(state["velocity"])
         if max_velocity > self.vel_limit[1] or min_velocity < self.vel_limit[0]:
-            print(max_velocity ,min_velocity)
-            print("Velocity exceed limit!\n")
+            # print(max_velocity ,min_velocity)
+            # print("Velocity exceed limit!\n")
             return False
 
         # acceleration check
         max_acceleration = np.max(state["acceleration"])
         min_acceleration = np.min(state["acceleration"])
         if max_acceleration > self.acc_limit[1] or min_acceleration < self.acc_limit[0]:
-            print(max_acceleration ,min_acceleration)
-            print("Acceleration exceed limit!\n")
+            # print(max_acceleration ,min_acceleration)
+            # print("Acceleration exceed limit!\n")
             return False
         return True
 
@@ -122,7 +122,8 @@ class single_dimension_stomp():
             self.A, self.inv_R, self.M = self.calculate_inv_R_and_M()
         self.state_record = generate_state(np.array(point_array), self.args)
     
-    def diffusion(self):
+    def diffusion(self, seed):
+        np.random.seed(int(seed))
         # 生成K条噪声轨迹, 暂时最后的点还未加噪声
         eph = np.random.multivariate_normal(np.zeros((self.num_points)), 
             # 0.1 * np.abs(self.state_record["position"][-1] - self.state_record["position"][0]) * self.inv_R)

@@ -68,9 +68,9 @@ class Multi_dimensions_stomp():
         for i in range(self.dimensions_num):
             self.single_dimension_list[i].Update_state(joints_traj[:, i])
 
-    def multiDimension_diffusion(self):
+    def multiDimension_diffusion(self, iter_num):
         for i in range(self.dimensions_num):
-            self.single_dimension_list[i].diffusion()
+            self.single_dimension_list[i].diffusion(iter_num * (i + 1))
     
     def calculate_weights(self):
         # 初始化
@@ -136,6 +136,15 @@ class Multi_dimensions_stomp():
                 self.reuse_state["position"][index, :, :] = n_state["position"]
                 self.reuse_state["velocity"][index, :, :] = n_state["velocity"]
                 self.reuse_state["acceleration"][index, :, :] = n_state["acceleration"]
-                print("Exchange Successfully!\n")
+                # print("Exchange Successfully!\n")
             else:
                 pass
+    
+    def Reset(self):
+        # 记录 reuse state
+        if self.args.reuse_state:
+            self.reuse_trajectory = 0
+            self.reuse_state = {"position": np.zeros((self.args.reuse_num, self.num_points, self.dimensions_num)),
+                                "velocity": np.zeros((self.args.reuse_num, self.num_points, self.dimensions_num)), 
+                                "acceleration": np.zeros((self.args.reuse_num, self.num_points, self.dimensions_num))}
+            self.reuse_weights = np.zeros((self.args.reuse_num, self.num_points))

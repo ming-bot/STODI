@@ -64,7 +64,7 @@ class Sentry():
             self.pioneer['neighbour'] = deepcopy(self.pioneer['best'])
     
     def New_turn(self, new_init):
-        init_trajNode = TrajNode(new_init)
+        init_trajNode = TrajNode(new_init, self.args)
         self.cost_func.Update_state(init_trajNode.state)
         init_trajNode.Update_Cost(np.sum(self.cost_func.calculate_total_cost(self.args.ContourCost)))
         self.pioneer = {"best": deepcopy(init_trajNode), 

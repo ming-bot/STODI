@@ -23,7 +23,7 @@ class RobotArm:
         self.control_mode = "torque"
 
         # connect pybullet
-        p.connect(p.GUI)
+        p.connect(p.DIRECT) # p.DIRECT, p.GUI
         p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0)
         p.resetSimulation()
         p.setTimeStep(self.stepsize)
