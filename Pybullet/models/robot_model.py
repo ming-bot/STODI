@@ -23,7 +23,7 @@ class RobotArm:
         self.control_mode = "torque"
 
         # connect pybullet
-        p.connect(p.DIRECT) # p.DIRECT, p.GUI
+        p.connect(p.GUI) # p.DIRECT, p.GUI
         p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0)
         p.resetSimulation()
         p.setTimeStep(self.stepsize)
@@ -50,7 +50,13 @@ class RobotArm:
             self.robot = p.loadURDF("z1_description/z1.urdf", useFixedBase=True, flags=p.URDF_USE_SELF_COLLISION)
         else:
             raise ValueError('Invalid robot name.')
+
         
+        if args.ObstacleCost and self.robot_name == 'Panda':
+            self.obstacle = []
+            bp = [0.25, 0.0, 0.9]
+            obs = p.loadURDF("obstacle/sphere.urdf", basePosition=bp, globalScaling=1.0)
+            self.obstacle.append(bp + [0.08])
         # example 2：机械臂和小方块、小圆球在桌上
 
         # self.robot = p.loadURDF("panda/panda.urdf", basePosition=[0.00000, -0.200000, 1.200000], baseOrientation=[0.000000, 0.000000,
@@ -77,12 +83,12 @@ class RobotArm:
         self.target_torque = []
 
         for j in range(self.dof):
-                joint_info = p.getJointInfo(self.robot, j)
-                self.joints.append(j)
-                self.q_min.append(joint_info[8])
-                self.q_max.append(joint_info[9])
-                self.target_pos.append((self.q_min[j] + self.q_max[j]) / 2.0)
-                self.target_torque.append(0.)
+            joint_info = p.getJointInfo(self.robot, j)
+            self.joints.append(j)
+            self.q_min.append(joint_info[8])
+            self.q_max.append(joint_info[9])
+            self.target_pos.append((self.q_min[j] + self.q_max[j]) / 2.0)
+            self.target_torque.append(0.)
         # 调整初始摄像头视角
         # camera parameters：摄像头到目标位置的距离，摄像头的偏航角（水平旋转角度），摄像头的仰角（垂直旋转角度），摄像头的目标位置，即摄像头对准的点的坐标
         if self.robot_name == 'Panda':
@@ -98,8 +104,8 @@ class RobotArm:
         self.t = 0.0
         self.control_mode = "torque"
         if self.robot_name == 'Panda':
-            self.target_pos = [0., -0.7, 0.0, -1.6, 0., 3.5, 0.7]  # 末端处于高位
-            # self.target_pos = [0., 0., 0., -1.6, 0., 1.87, 0.]    # 末端处于低位
+            # self.target_pos = [0., -0.7, 0.0, -1.6, 0., 3.5, 0.7]  # 末端处于高位
+            self.target_pos = [0., 0., 0., -1.6, 0., 1.87, 0.]    # 末端处于低位
         elif self.robot_name == 'Z1':
             self.target_pos = [-0.3, 0.68, -1.04, 0.18, 0.245, -0.17] # 末端处于高位
 
@@ -188,6 +194,22 @@ class RobotArm:
             p.resetJointState(self.robot, i, original_joint_positions[i])
 
         return end_effector_array
+    
+    def GetAllLink(self, joints_array):
+        original_joint_positions, _ = self.getJointStates() # 保存原始关节角度
+        Link_pos_list = []
+        for k in range(joints_array.shape[0]):
+            Link_pos_list.append([])
+            for j in range(joints_array.shape[1]):
+                p.resetJointState(self.robot, j, joints_array[k, j])
+                link_state = p.getLinkState(self.robot, j)
+                Link_pos_list[k].append(np.array(link_state[0]))
+
+        # 恢复原始关节状态
+        for i in range(len(original_joint_positions)):
+            p.resetJointState(self.robot, i, original_joint_positions[i])
+
+        return Link_pos_list
 
     def traj_pos_control(self, joints_array):
         # 位置控制（STODI没用，参考力矩控制修改）

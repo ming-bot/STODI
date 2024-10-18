@@ -116,7 +116,7 @@ def main_single_traj(args):
     while(iter_num < total_iter_num):
         iter_num += 1
         # 0. generate noisy trajectory
-        stomp_py.multiDimension_diffusion()
+        stomp_py.multiDimension_diffusion(iter_num)
         # 1.1 calculate voyager weights
         temp_iter_traj = copy.copy(sentry.pioneer['voyager'].traj)
         stomp_py.multi_update(joints_traj=sentry.pioneer['voyager'].traj)
@@ -216,7 +216,7 @@ def stochastic_optimization_stomp(compare, stomp_py, sentry, cost_function, reco
         while(iter_num < total_iter_num):
             iter_num += 1
             # 0. generate noisy trajectory
-            stomp_py.multiDimension_diffusion()
+            stomp_py.multiDimension_diffusion(iter_num)
             # 1.1 calculate voyager weights
             temp_iter_traj = copy.copy(sentry.pioneer['voyager'].traj)
             stomp_py.multi_update(joints_traj=sentry.pioneer['voyager'].traj)
@@ -429,10 +429,10 @@ if __name__ == "__main__":
     parser.add_argument("--decay", type=float, default=0.9) # decay for better 收敛 0.96
     parser.add_argument("--STO", type=str, choices=["STODI", "STOMP"], default="STODI") # 是什么随机优化框架
     # loss参数
-    parser.add_argument("--ContourCost", type=str, choices=["NONE", "DTW", "MSES", "MSEPS", "NMSEPS", "MSE"], default="DTW") # 模仿学习的loss函数指标选择
-    parser.add_argument("--ObstacleCost", type=str, choices=["NONE", "STOMP"], default="STOMP") # 避障的loss
-    parser.add_argument("--ConstraintCost", type=str, choices=["NONE", "STOMP"], default="STOMP") # 约束的loss
-    parser.add_argument("--TorqueCost", type=str, choices=["NONE", "STOMP"], default="STOMP") # 力矩的loss
+    parser.add_argument("--ContourCost", type=str, choices=[None, "DTW", "MSES", "MSEPS", "NMSEPS", "MSE"], default="DTW") # 模仿学习的loss函数指标选择
+    parser.add_argument("--ObstacleCost", type=str, choices=[None, "STOMP"], default="STOMP") # 避障的loss
+    parser.add_argument("--ConstraintCost", type=str, choices=[None, "STOMP"], default="STOMP") # 约束的loss
+    parser.add_argument("--TorqueCost", type=str, choices=[None, "STOMP"], default="STOMP") # 力矩的loss
     # 结果可视化参数
     parser.add_argument("--visual-loss", action="store_true")
     parser.add_argument("--visual-traj", action="store_true")
@@ -448,5 +448,5 @@ if __name__ == "__main__":
     if not osp.isdir(f"{args.file_path}/results/{args.expt_name}/"):
         os.makedirs(f"{args.file_path}/results/{args.expt_name}/")
     # 单次选择运行（STOMP,STODI）的主函数
-    # main_single_traj(args=args)
-    main(10, args)
+    main_single_traj(args=args)
+    # main(10, args)

@@ -1,5 +1,6 @@
 import numpy as np
 from .contour_cost import *
+from models import World
 import copy
 
 def generate_cartesian_state(trajectory, args):
@@ -24,6 +25,8 @@ class Multi_Cost():
         self.end_effector_traj_list = None
         self.cartesian_effector_state = None
         self.init_cartesian_traj = self.robot.solveListKinematics(init_trajectory)[:, :3] # N * 3
+        if args.ObstacleCost:
+            self.world = World(robot, robot.obstacle)
     
     def Update_state(self, state):
         self.state = state # {"position": N * 7, "velocity": N * 7, "acceleration": N * 7}
@@ -65,16 +68,13 @@ class Multi_Cost():
         cost = 0
         return cost
 
+    # 其实这个函数取名有点问题，其实是用作在评分中的函数
     def end_effector_state_cost(self):
-        velocity = self.cartesian_effector_state["velocity"] # N * 7
-        # print(velocity)
-        # acceleration = self.cartesian_effector_state["acceleration"] # N * 7
-        # velocity_vector_size = np.sqrt(velocity[:, 0]**2 + velocity[:, 1]**2 + velocity[:, 2]**2) # N * 1
-        # print(velocity_vector_size)
-        # acceleration_vector_size = np.sqrt(acceleration[:, 0]**2 + acceleration[:, 1]**2 + acceleration[:, 2]**2) # N * 1
-
-        # 暂定的q
-
+        # 暂定的q = q_o + q_s + q_v + q_e
+        q = np.zeros(shape=(self.cartesian_effector_state["velocity"].shape[0], 1))
+        if self.args.ObstacleCost:
+            q_o = self.world.calculate_EDT(self.state['position']) # N * 7
+            q = q + q_o
         # VELOCITY_BAR = 0.1
         # dt = 1.0 / self.args.sample_frequency
         # q_v = dt * (VELOCITY_BAR * np.ones(velocity.shape[0]) - velocity_vector_size)**2 \
@@ -82,8 +82,9 @@ class Multi_Cost():
         # + (1.0 / 3) * dt **3 * acceleration_vector_size * acceleration_vector_size
 
         if self.args.ContourCost:
-            q_v = np.ones(velocity.shape[0]) * self.calculate_contour_cost(self.args.ContourCost)
-        return q_v # N * 1
+            q_s = np.ones(q.shape) * self.calculate_contour_cost(self.args.ContourCost) # N * 1
+            q = q + q_s
+        return q # N * 1
 
 
     def calculate_total_cost(self, str):

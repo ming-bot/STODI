@@ -58,7 +58,9 @@ The `src` folder contains images and some other supplementary materials for our 
 
 ## 4. Important Updating! (10.10)
 
-We combine the STOMP and STODI in the Pybullet Folder, which also contains the Panda and Z1 Robot!
+We combine the STOMP and STODI in the Pybullet Folder, which also contains the Panda and Z1 Robot！
+
+We add the obstacle cost into the Stochastic Optimization Process!
 
 
 

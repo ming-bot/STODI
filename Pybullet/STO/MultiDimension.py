@@ -84,7 +84,7 @@ class Multi_dimensions_stomp():
                 state["velocity"][:, j] = self.single_dimension_list[j].diffusion_trajectory["velocity"][i,:]
                 state["acceleration"][:, j] = self.single_dimension_list[j].diffusion_trajectory["acceleration"][i,:]
             self.cost_function.Update_state(state)
-            weights[i, :] = self.cost_function.end_effector_state_cost() # N * 1
+            weights[i, :] = self.cost_function.end_effector_state_cost().squeeze() # N * 1
         
         # reuse trajectory
         if self.args.reuse_state:
@@ -120,7 +120,7 @@ class Multi_dimensions_stomp():
 
     def update_reuse_traj(self, n_state):
         self.cost_function.Update_state(n_state)
-        temp_cost = self.cost_function.end_effector_state_cost()
+        temp_cost = self.cost_function.end_effector_state_cost().squeeze() # N * 1
         cost = np.sum(temp_cost)
         if self.reuse_trajectory < self.args.reuse_num:
             self.reuse_weights[self.reuse_trajectory,:] = np.copy(temp_cost)
