@@ -122,8 +122,7 @@ class single_dimension_stomp():
             self.A, self.inv_R, self.M = self.calculate_inv_R_and_M()
         self.state_record = generate_state(np.array(point_array), self.args)
     
-    def diffusion(self, seed):
-        np.random.seed(int(seed))
+    def diffusion(self):
         # 生成K条噪声轨迹, 暂时最后的点还未加噪声
         eph = np.random.multivariate_normal(np.zeros((self.num_points)), 
             # 0.1 * np.abs(self.state_record["position"][-1] - self.state_record["position"][0]) * self.inv_R)

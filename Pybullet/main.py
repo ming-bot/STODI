@@ -1,13 +1,10 @@
-import sys
-# sys.path.append(r'G:/STODI/franka-pybullet/src')
 import argparse
 import os
 import os.path as osp
 import numpy as np
 import copy
-import copy
-import matplotlib.pyplot as plt
 import time
+import json
 from tqdm import *
 
 from models import RobotArm
@@ -15,38 +12,20 @@ from Costs import Multi_Cost
 from STO import *
 from Visualization import *
 
-def Draw_cost(cost_list):
-    x = np.linspace(0, 1, len(cost_list))
-    y = cost_list
-    plt.plot(x, y, linewidth=1)
-    plt.xlabel('Optimized processes (%)')
-    plt.ylabel('Cost function value')
-    plt.title('Stoil Optimization')
-    plt.show()
-
-def write_trajectory(item, path):
-    traj_logfile = open(path, 'w')
-    for i in range(item.shape[0]):
-        traj_logfile.write(" ".join(str(thing) for thing in item[i]))
-        traj_logfile.write("\n")
-    traj_logfile.close()
-
-def write_joints(item, path):
-    traj_logfile = open(path, 'w')
-    for i in range(item.shape[0]):
-        for j in range(item.shape[1]):
-            traj_logfile.write(" ".join(str(thing) for thing in item[i, j]))
-            traj_logfile.write(" ")
-        traj_logfile.write("\n")
-    traj_logfile.close()
+POSTURE = {'front': [-0.4873441065691155, 0.5814711977864513, 0.9234217980183635, -1.2212066335195748, -0.3227819795704253, 2.247907005921566, 0.18368041341779082],
+           'back':[-0.43700637536473935, -1.4892142186045723, 0.4836279074937232, -2.19738087759112, 0.8110974564673381, 0.6360887472170061, 0.3197152547171901],
+           'left': [0.3884776329219501, -0.9546968008083578, -0.9810819639199435, -1.9271960854579653, -0.8515225212999344, 1.6225280247076888, -0.4879094307978122],
+           'middle':[0, 0, 0, -1.6, 0, 1.87, 0],
+           'up': [0.0, -0.7, 0.0, -1.6, 0.0, 3.5, 0.7],
+           'right':[-0.3948859155257995, -0.7270775750246515, 0.9705156650028227, -1.7756625474152135, -0.2109975244307001, 2.7461024636268965, 1.071975144388428],}
 
 def main_single_traj(args):
     # 0. initial the Simulator(Franka, Z1)
     robot = RobotArm(args)
 
     # 1.需要的输入为: Configuration Space的起点和终点; 使用线性插值的手段生成初始轨迹
-    begin_inCspace = [0, 0, 0, -1.6, 0, 1.87, 0]
-    end_inCspace = [0, -0.7, 0, -1.6, 0, 3.5, 0.7]
+    begin_inCspace = POSTURE['back']
+    end_inCspace = POSTURE['front']
     # begin_inCspace = [-0.3, 0.68, -1.04, 0.18, 0.245, -0.17]
     # end_inCspace = [-0.3, 1, -0.8, 0.18, 0.245, -0.17]
     initial_trajectory = Joint_linear_initial(begin=begin_inCspace, end=end_inCspace)
@@ -113,10 +92,11 @@ def main_single_traj(args):
     
     begin_time = time.time()
     # begin optimal loops
+    
     while(iter_num < total_iter_num):
         iter_num += 1
         # 0. generate noisy trajectory
-        stomp_py.multiDimension_diffusion(iter_num)
+        stomp_py.multiDimension_diffusion()
         # 1.1 calculate voyager weights
         temp_iter_traj = copy.copy(sentry.pioneer['voyager'].traj)
         stomp_py.multi_update(joints_traj=sentry.pioneer['voyager'].traj)
@@ -124,8 +104,8 @@ def main_single_traj(args):
         n7_proved_noise = stomp_py.calculate_delta_noise(weights_p=kn_weights)
 
         # 1.2 get new trajectory
-        # temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + (args.decay**iter_num) * n7_proved_noise[1:-1, :] # N * 7
-        temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + n7_proved_noise[1:-1, :] # N * 7
+        temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + (args.decay**iter_num) * n7_proved_noise[1:-1, :] # N * 7
+        # temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + n7_proved_noise[1:-1, :] # N * 7
         # 1.3 limit check
         if stomp_py.multi_limit_check(temp_iter_traj):
             # 1.4 Update Voyager
@@ -148,7 +128,7 @@ def main_single_traj(args):
             n7_proved_noise = stomp_py.calculate_delta_noise(weights_p=kn_weights)
 
             # 2.2 get new trajectory
-            temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + (args.decay**iter_num) * n7_proved_noise[1:-1, :] # N * 7
+            temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + (args.decay**iter_num) * 0.5 * n7_proved_noise[1:-1, :] # N * 7
             # temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + n7_proved_noise[1:-1, :] # N * 7
             # 2.3 limit check
             if stomp_py.multi_limit_check(temp_iter_traj):
@@ -182,27 +162,29 @@ def main_single_traj(args):
     
     robot.traj_torque_control(final_traj_state["position"], final_traj_state["velocity"], final_traj_state["acceleration"])
     print("演示结束!")
-    
-    # robot.traj_control(iter_traj)
-    # print(Qcost_list)
-    # Draw_cost(voyager_Qcost_total_list)
-    # Draw_cost(neighbour_Qcost_total_list)
-    # Draw_cost(list(np.array(neighbour_Qcost_list)[:,1]))
 
     if args.STO == 'STODI':
         end_effector = robot.solveListKinematics(sentry.pioneer['best'].traj)
     elif args.STO == 'STOMP':
         end_effector = robot.solveListKinematics(sentry.pioneer['voyager'].traj)
     
-    eff = np.array(robot.solveListKinematics(demostrantion))
-    Draw_3trajectory(init_end_effector, end_effector, eff)
-    # # print(end_effector.shape)
-    # write_trajectory(end_effector[:, :3], f"{args.file_path}/results/{args.expt_name}/trajectory_logs.txt")
-    # write_joints(np.array(neighbour_iter_joints), f"{args.file_path}/results/{args.expt_name}/joints_logs.txt")
+    demonstration_eff = robot.solveListKinematics(demostrantion)
+    Draw_3trajectory(init_end_effector, end_effector, demonstration_eff)
 
-    # logfile = open(f"{args.file_path}/results/{args.expt_name}/result_logs.txt", 'w')
-    # logfile.write("\n".join(str(item) for item in neighbour_Qcost_list))
-    # logfile.close()
+    writing_results = {
+        'init_traj': init_end_effector.tolist(),
+        'result_traj': end_effector.tolist(),
+        'demonstration': demonstration_eff.tolist(),
+    }
+    
+    if args.STO == 'STODI':
+        writing_results['cost'] = np.array(neighbour_Qcost_list).tolist()
+    elif args.STO == 'STOMP':
+        writing_results['cost'] = np.array(voyager_Qcost_list).tolist()
+    
+    with open(f"{args.file_path}/results/{args.expt_name}.json", 'w') as f:
+        json.dump(writing_results, f)
+
 
 def stochastic_optimization_stomp(compare, stomp_py, sentry, cost_function, record_list, args):
     voyager_Qcost_list = copy.copy(record_list[0])
@@ -216,7 +198,7 @@ def stochastic_optimization_stomp(compare, stomp_py, sentry, cost_function, reco
         while(iter_num < total_iter_num):
             iter_num += 1
             # 0. generate noisy trajectory
-            stomp_py.multiDimension_diffusion(iter_num)
+            stomp_py.multiDimension_diffusion()
             # 1.1 calculate voyager weights
             temp_iter_traj = copy.copy(sentry.pioneer['voyager'].traj)
             stomp_py.multi_update(joints_traj=sentry.pioneer['voyager'].traj)
@@ -224,8 +206,8 @@ def stochastic_optimization_stomp(compare, stomp_py, sentry, cost_function, reco
             n7_proved_noise = stomp_py.calculate_delta_noise(weights_p=kn_weights)
 
             # 1.2 get new trajectory
-            # temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + (args.decay**iter_num) * n7_proved_noise[1:-1, :] # N * 7
-            temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + n7_proved_noise[1:-1, :] # N * 7
+            temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + (args.decay**iter_num) * n7_proved_noise[1:-1, :] # N * 7
+            # temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + n7_proved_noise[1:-1, :] # N * 7
             # 1.3 limit check
             if stomp_py.multi_limit_check(temp_iter_traj):
                 # 1.4 Update Voyager
@@ -246,7 +228,7 @@ def stochastic_optimization_stomp(compare, stomp_py, sentry, cost_function, reco
         begin_time = time.time()
         while(1):
             iter_num += 1
-            stomp_py.multiDimension_diffusion(iter_num)
+            stomp_py.multiDimension_diffusion()
             # 1.1 calculate voyager weights
             temp_iter_traj = copy.copy(sentry.pioneer['voyager'].traj)
             stomp_py.multi_update(joints_traj=sentry.pioneer['voyager'].traj)
@@ -254,8 +236,7 @@ def stochastic_optimization_stomp(compare, stomp_py, sentry, cost_function, reco
             n7_proved_noise = stomp_py.calculate_delta_noise(weights_p=kn_weights)
 
             # 1.2 get new trajectory
-            # temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + (args.decay**iter_num) * n7_proved_noise[1:-1, :] # N * 7
-            temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + n7_proved_noise[1:-1, :] # N * 7
+            temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + (0.6**iter_num) * n7_proved_noise[1:-1, :] # N * 7
             # 1.3 limit check
             if stomp_py.multi_limit_check(temp_iter_traj):
                 # 1.4 Update Voyager
@@ -279,57 +260,110 @@ def stochastic_optimization_stodi(stomp_py, sentry, cost_function, record_list, 
     iter_num = 0
     total_iter_num = args.iter_num
     begin_time = time.time()
-    # begin optimal loops
-    while(iter_num < total_iter_num):
-        iter_num += 1
-        # 0. generate noisy trajectory
-        stomp_py.multiDimension_diffusion(iter_num)
-        # 1.1 calculate voyager weights
-        temp_iter_traj = copy.copy(sentry.pioneer['voyager'].traj)
-        stomp_py.multi_update(joints_traj=sentry.pioneer['voyager'].traj)
-        kn_weights = stomp_py.calculate_weights()
-        n7_proved_noise = stomp_py.calculate_delta_noise(weights_p=kn_weights)
+    if args.time == 0:
+        # begin optimal loops
+        while(iter_num < total_iter_num):
+            iter_num += 1
+            # 0. generate noisy trajectory
+            stomp_py.multiDimension_diffusion()
+            # 1.1 calculate voyager weights
+            temp_iter_traj = copy.copy(sentry.pioneer['voyager'].traj)
+            stomp_py.multi_update(joints_traj=sentry.pioneer['voyager'].traj)
+            kn_weights = stomp_py.calculate_weights()
+            n7_proved_noise = stomp_py.calculate_delta_noise(weights_p=kn_weights)
 
-        # 1.2 get new trajectory
-        # temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + (args.decay**iter_num) * n7_proved_noise[1:-1, :] # N * 7
-        temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + n7_proved_noise[1:-1, :] # N * 7
-        # 1.3 limit check
-        if stomp_py.multi_limit_check(temp_iter_traj):
-            # 1.4 Update Voyager
-            sentry.Update('voyager', temp_iter_traj)
-            # 1.5 Using for reuse
-            if args.reuse_state:
-                stomp_py.update_reuse_traj(generate_multi_state(temp_iter_traj, args=args))
+            # 1.2 get new trajectory
+            temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + (args.decay**iter_num) * n7_proved_noise[1:-1, :] # N * 7
+            # temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + n7_proved_noise[1:-1, :] # N * 7
+            # 1.3 limit check
+            if stomp_py.multi_limit_check(temp_iter_traj):
+                # 1.4 Update Voyager
+                sentry.Update('voyager', temp_iter_traj)
+                # 1.5 Using for reuse
+                if args.reuse_state:
+                    stomp_py.update_reuse_traj(generate_multi_state(temp_iter_traj, args=args))
 
-        # 2.1 calculate neighbour weights
-        temp_iter_traj = copy.copy(sentry.pioneer['neighbour'].traj)
-        stomp_py.multi_update(joints_traj=sentry.pioneer['neighbour'].traj)
-        kn_weights = stomp_py.calculate_weights()
-        n7_proved_noise = stomp_py.calculate_delta_noise(weights_p=kn_weights)
+            # 2.1 calculate neighbour weights
+            temp_iter_traj = copy.copy(sentry.pioneer['neighbour'].traj)
+            stomp_py.multi_update(joints_traj=sentry.pioneer['neighbour'].traj)
+            kn_weights = stomp_py.calculate_weights()
+            n7_proved_noise = stomp_py.calculate_delta_noise(weights_p=kn_weights)
 
-        # 2.2 get new trajectory
-        temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + (args.decay**iter_num) * n7_proved_noise[1:-1, :] # N * 7
-        # temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + n7_proved_noise[1:-1, :] # N * 7
-        # 2.3 limit check
-        if stomp_py.multi_limit_check(temp_iter_traj):
-            # 2.4 Update Neighbour
-            sentry.Update('neighbour', temp_iter_traj)
-            # 2.5 Using for reuse
-            if args.reuse_state:
-                stomp_py.update_reuse_traj(generate_multi_state(temp_iter_traj, args=args))
-            # Cost voyager cost( Just for visualize )
-            cost_function.Update_state(generate_multi_state(temp_iter_traj, args=args))
-            neighbour_Qcost_list.append(cost_function.calculate_total_cost(args.ContourCost))
-            # Record voyager
-            neighbour_iter_joints.append(copy.copy(temp_iter_traj))
-        # 3. Update the best
-        sentry.Update('best')
-        # 4. clock align the best and the neighbour
-        if iter_num % (total_iter_num / 10):
-            sentry.Update('clock')
-    Optimization_time = time.time() - begin_time
+            # 2.2 get new trajectory
+            temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + (args.decay**iter_num) * n7_proved_noise[1:-1, :] # N * 7
+            # temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + n7_proved_noise[1:-1, :] # N * 7
+            # 2.3 limit check
+            if stomp_py.multi_limit_check(temp_iter_traj):
+                # 2.4 Update Neighbour
+                sentry.Update('neighbour', temp_iter_traj)
+                # 2.5 Using for reuse
+                if args.reuse_state:
+                    stomp_py.update_reuse_traj(generate_multi_state(temp_iter_traj, args=args))
+                # Cost voyager cost( Just for visualize )
+                cost_function.Update_state(generate_multi_state(temp_iter_traj, args=args))
+                neighbour_Qcost_list.append(cost_function.calculate_total_cost(args.ContourCost))
+                # Record voyager
+                neighbour_iter_joints.append(copy.copy(temp_iter_traj))
+            # 3. Update the best
+            sentry.Update('best')
+            # 4. clock align the best and the neighbour
+            if iter_num % (total_iter_num / 10):
+                sentry.Update('clock')
+        Optimization_time = time.time() - begin_time
 
-    return Optimization_time, neighbour_Qcost_list, neighbour_iter_joints
+        return Optimization_time, neighbour_Qcost_list, neighbour_iter_joints
+    else:
+        # begin optimal loops
+        while(time.time() - begin_time < args.time):
+            iter_num += 1
+            # 0. generate noisy trajectory
+            stomp_py.multiDimension_diffusion()
+            # 1.1 calculate voyager weights
+            temp_iter_traj = copy.copy(sentry.pioneer['voyager'].traj)
+            stomp_py.multi_update(joints_traj=sentry.pioneer['voyager'].traj)
+            kn_weights = stomp_py.calculate_weights()
+            n7_proved_noise = stomp_py.calculate_delta_noise(weights_p=kn_weights)
+
+            # 1.2 get new trajectory
+            temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + (args.decay**iter_num) * n7_proved_noise[1:-1, :] # N * 7
+            # temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + n7_proved_noise[1:-1, :] # N * 7
+            # 1.3 limit check
+            if stomp_py.multi_limit_check(temp_iter_traj):
+                # 1.4 Update Voyager
+                sentry.Update('voyager', temp_iter_traj)
+                # 1.5 Using for reuse
+                if args.reuse_state:
+                    stomp_py.update_reuse_traj(generate_multi_state(temp_iter_traj, args=args))
+
+            # 2.1 calculate neighbour weights
+            temp_iter_traj = copy.copy(sentry.pioneer['neighbour'].traj)
+            stomp_py.multi_update(joints_traj=sentry.pioneer['neighbour'].traj)
+            kn_weights = stomp_py.calculate_weights()
+            n7_proved_noise = stomp_py.calculate_delta_noise(weights_p=kn_weights)
+
+            # 2.2 get new trajectory
+            temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + (args.decay**iter_num) * n7_proved_noise[1:-1, :] # N * 7
+            # temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + n7_proved_noise[1:-1, :] # N * 7
+            # 2.3 limit check
+            if stomp_py.multi_limit_check(temp_iter_traj):
+                # 2.4 Update Neighbour
+                sentry.Update('neighbour', temp_iter_traj)
+                # 2.5 Using for reuse
+                if args.reuse_state:
+                    stomp_py.update_reuse_traj(generate_multi_state(temp_iter_traj, args=args))
+                # Cost voyager cost( Just for visualize )
+                cost_function.Update_state(generate_multi_state(temp_iter_traj, args=args))
+                neighbour_Qcost_list.append(cost_function.calculate_total_cost(args.ContourCost))
+                # Record voyager
+                neighbour_iter_joints.append(copy.copy(temp_iter_traj))
+            # 3. Update the best
+            sentry.Update('best')
+            # 4. clock align the best and the neighbour
+            if iter_num % (total_iter_num / 10):
+                sentry.Update('clock')
+        Optimization_time = time.time() - begin_time
+
+        return Optimization_time, neighbour_Qcost_list, neighbour_iter_joints
 
 def main(times, args):
     # 0. initial the Simulator(Franka, Z1)
@@ -402,16 +436,22 @@ def main(times, args):
     
     avg_time = avg_time / times
     print(avg_time)
+    if args.time > 0:
+        avg_time = args.time
 
+    stomp_avg_time = 0
     for i in tqdm(range(times)):
         time, Q, Traj = stochastic_optimization_stomp(avg_time, stomp_py, sentry, cost_function, record_list, args)
+        stomp_avg_time = stomp_avg_time + time
         voyager_Qcost_TL.append(Q)
         voyager_joints_TL.append(Traj)
 
         # 重置初始条件
         sentry.New_turn(initial_trajectory)
         stomp_py.Reset()
-    
+
+    stomp_avg_time = stomp_avg_time / times
+    print(avg_time)
     Draw_Cost(voyager_Qcost_TL, neighbour_Qcost_TL, avg_time)
 
 if __name__ == "__main__":
@@ -426,10 +466,11 @@ if __name__ == "__main__":
     parser.add_argument("--reuse-state", type=bool, default=True) # 是否启用reuse
     parser.add_argument("--K", type=int, default=20) # STO选取的K条轨迹的数量 20
     parser.add_argument("--reuse-num", type=int, default=10) # reuse的数量 10
-    parser.add_argument("--decay", type=float, default=0.9) # decay for better 收敛 0.96
+    parser.add_argument("--time", type=float, default=0.0) # STO的迭代时间
+    parser.add_argument("--decay", type=float, default=0.8) # decay for better收敛
     parser.add_argument("--STO", type=str, choices=["STODI", "STOMP"], default="STODI") # 是什么随机优化框架
     # loss参数
-    parser.add_argument("--ContourCost", type=str, choices=[None, "DTW", "MSES", "MSEPS", "NMSEPS", "MSE"], default="DTW") # 模仿学习的loss函数指标选择
+    parser.add_argument("--ContourCost", type=str, choices=[None, "DTW", "MSES", "MSEPS", "NMSEPS", "MSE"], default="MSES") # 模仿学习的loss函数指标选择
     parser.add_argument("--ObstacleCost", type=str, choices=[None, "STOMP"], default="STOMP") # 避障的loss
     parser.add_argument("--ConstraintCost", type=str, choices=[None, "STOMP"], default="STOMP") # 约束的loss
     parser.add_argument("--TorqueCost", type=str, choices=[None, "STOMP"], default="STOMP") # 力矩的loss
@@ -445,8 +486,6 @@ if __name__ == "__main__":
     if not osp.isdir(f"{args.file_path}/results/"):
         os.makedirs(f"{args.file_path}/results/")
 
-    if not osp.isdir(f"{args.file_path}/results/{args.expt_name}/"):
-        os.makedirs(f"{args.file_path}/results/{args.expt_name}/")
     # 单次选择运行（STOMP,STODI）的主函数
     main_single_traj(args=args)
     # main(10, args)

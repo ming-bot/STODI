@@ -68,9 +68,9 @@ class Multi_dimensions_stomp():
         for i in range(self.dimensions_num):
             self.single_dimension_list[i].Update_state(joints_traj[:, i])
 
-    def multiDimension_diffusion(self, iter_num):
+    def multiDimension_diffusion(self):
         for i in range(self.dimensions_num):
-            self.single_dimension_list[i].diffusion(iter_num * (i + 1))
+            self.single_dimension_list[i].diffusion()
     
     def calculate_weights(self):
         # 初始化

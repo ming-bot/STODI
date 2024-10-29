@@ -2,6 +2,7 @@ import pybullet as p
 import numpy as np
 import time
 import pybullet_data
+import copy
 
 import argparse
 
@@ -54,9 +55,26 @@ class RobotArm:
         
         if args.ObstacleCost and self.robot_name == 'Panda':
             self.obstacle = []
-            bp = [0.25, 0.0, 0.9]
-            obs = p.loadURDF("obstacle/sphere.urdf", basePosition=bp, globalScaling=1.0)
-            self.obstacle.append(bp + [0.08])
+            # bp = [0.25, 0.0, 0.9]
+            # obs = p.loadURDF("obstacle/sphere.urdf", basePosition=bp, globalScaling=1.0)
+            # self.obstacle.append(copy.copy(bp + [0.08]))
+
+            # bp = [0.5, 0.3, 0.4]
+            # obs = p.loadURDF("obstacle/sphere.urdf", basePosition=bp, globalScaling=3.0)
+            # self.obstacle.append(copy.copy(bp + [0.24]))
+
+            # bp = [0.2, -0.3, 0.2]
+            # obs = p.loadURDF("obstacle/sphere.urdf", basePosition=bp, globalScaling=3.0)
+            # self.obstacle.append(copy.copy(bp + [0.24]))
+            
+            # related obstacle
+            # bp = [0.2, 0.4, 0.76]
+            # obs = p.loadURDF("obstacle/sphere.urdf", basePosition=bp, globalScaling=2.0)
+            # self.obstacle.append(copy.copy(bp + [0.16]))
+
+            # bp = [0.0, -0.3, 0.9]
+            # obs = p.loadURDF("obstacle/sphere.urdf", basePosition=bp, globalScaling=2.0)
+            # self.obstacle.append(copy.copy(bp + [0.16]))
         # example 2：机械臂和小方块、小圆球在桌上
 
         # self.robot = p.loadURDF("panda/panda.urdf", basePosition=[0.00000, -0.200000, 1.200000], baseOrientation=[0.000000, 0.000000,
@@ -92,7 +110,7 @@ class RobotArm:
         # 调整初始摄像头视角
         # camera parameters：摄像头到目标位置的距离，摄像头的偏航角（水平旋转角度），摄像头的仰角（垂直旋转角度），摄像头的目标位置，即摄像头对准的点的坐标
         if self.robot_name == 'Panda':
-            p.resetDebugVisualizerCamera(cameraDistance=2, cameraYaw=10, cameraPitch=-20, cameraTargetPosition=[0, 0, 0.2])
+            p.resetDebugVisualizerCamera(cameraDistance=1.5, cameraYaw=90, cameraPitch=-30, cameraTargetPosition=[0, 0, 0.4])
         elif self.robot_name == 'Z1':
             p.resetDebugVisualizerCamera(cameraDistance=0.7, cameraYaw=30, cameraPitch=-10, cameraTargetPosition=[0, 0, 0.1])
         

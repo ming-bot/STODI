@@ -9,7 +9,7 @@ def Joint_linear_initial(begin, end):
     # begin point should be 1 * dofs, the same with end point
     begin = np.array(begin)
     end = np.array(end)
-    points_num = 128
+    points_num = 64
     initial_trajectory = np.zeros(shape=(points_num, begin.shape[0])) # 构造轨迹序列
     for i in range(points_num):
         initial_trajectory[i, :] = begin + (end - begin) * float(i)  / (points_num - 1)
@@ -19,7 +19,7 @@ def Joint_linear_initial(begin, end):
 legency
 '''
 def Generate_demonstration(begin, end):
-    external = np.array([-0.3948859155257995, -0.7270775750246515, 0.9705156650028227, -1.7756625474152135, -0.2109975244307001, 2.7461024636268965, 1.071975144388428])
+    external = np.array([-0.3948859155257995, -0.7270775750246515, 0.9705156650028227, -1.7756625474152135, -0.2109975244307001, 2.7461024636268965, 1.071975144388428]) # POSTURE['right']
     begin = np.array(begin)
     end = np.array(end)
     points_num = 64
