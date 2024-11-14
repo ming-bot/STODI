@@ -24,8 +24,8 @@ def main_single_traj(args):
     robot = RobotArm(args)
 
     # 1.需要的输入为: Configuration Space的起点和终点; 使用线性插值的手段生成初始轨迹
-    begin_inCspace = POSTURE['back']
-    end_inCspace = POSTURE['front']
+    begin_inCspace = POSTURE['middle']
+    end_inCspace = POSTURE['up']
     # begin_inCspace = [-0.3, 0.68, -1.04, 0.18, 0.245, -0.17]
     # end_inCspace = [-0.3, 1, -0.8, 0.18, 0.245, -0.17]
     initial_trajectory = Joint_linear_initial(begin=begin_inCspace, end=end_inCspace)
@@ -470,7 +470,7 @@ if __name__ == "__main__":
     parser.add_argument("--decay", type=float, default=0.8) # decay for better收敛
     parser.add_argument("--STO", type=str, choices=["STODI", "STOMP"], default="STODI") # 是什么随机优化框架
     # loss参数
-    parser.add_argument("--ContourCost", type=str, choices=[None, "DTW", "MSES", "MSEPS", "NMSEPS", "MSE"], default="MSES") # 模仿学习的loss函数指标选择
+    parser.add_argument("--ContourCost", type=str, choices=[None, "DTW", "MSES", "MSEPS", "NMSEPS", "MSE"], default="DTW") # 模仿学习的loss函数指标选择
     parser.add_argument("--ObstacleCost", type=str, choices=[None, "STOMP"], default="STOMP") # 避障的loss
     parser.add_argument("--ConstraintCost", type=str, choices=[None, "STOMP"], default="STOMP") # 约束的loss
     parser.add_argument("--TorqueCost", type=str, choices=[None, "STOMP"], default="STOMP") # 力矩的loss

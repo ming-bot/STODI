@@ -12,7 +12,7 @@ init初始化机器人相关函数功能；
 step推进仿真；
 reset重置仿真器至初始状态；
 '''
-class RobotArm:
+class RobotArm():
     def __init__(self, args, stepsize=1e-3, realtime=0) -> object:
         self.t = 0.0
         self.stepsize = stepsize
@@ -39,7 +39,7 @@ class RobotArm:
         elif self.robot_name == 'Z1':
             self.position_control_gain_p = [0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
             self.position_control_gain_d = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-            self.max_torque = [100, 100, 100, 100, 100, 100]
+            self.max_torque = [30, 60, 30, 30, 30, 30]
         
         # load models
         p.setAdditionalSearchPath("./Pybullet/models")
@@ -75,6 +75,13 @@ class RobotArm:
             # bp = [0.0, -0.3, 0.9]
             # obs = p.loadURDF("obstacle/sphere.urdf", basePosition=bp, globalScaling=2.0)
             # self.obstacle.append(copy.copy(bp + [0.16]))
+        elif args.ObstacleCost and self.robot_name == 'Z1':
+            self.obstacle = []
+
+            bp = [0.2, 0.15, 0.3]
+            obs = p.loadURDF("obstacle/sphere.urdf", basePosition=bp, globalScaling=0.5)
+            self.obstacle.append(copy.copy(bp + [0.04]))
+
         # example 2：机械臂和小方块、小圆球在桌上
 
         # self.robot = p.loadURDF("panda/panda.urdf", basePosition=[0.00000, -0.200000, 1.200000], baseOrientation=[0.000000, 0.000000,

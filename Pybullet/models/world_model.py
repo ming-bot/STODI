@@ -7,8 +7,8 @@ class World(object):
     def __init__(self, robot, obstacle:list):
         self.robot = robot # 机器人模型
         self.obstacles = obstacle # 包含障碍物的三维坐标，以及半径
-        self.secure_space = 0.05 # 5cm的缓冲区
-        self.robot_radiu = 0.05 # 建模为机械臂关节之间为线段，宽度为10cm
+        self.secure_space = 0.02 # 5cm的缓冲区
+        self.robot_radiu = 0.03 # 建模为机械臂关节之间为线段，宽度为10cm
 
         print("Successfully initialize {} obstales.".format(len(self.obstacles)))
 
