@@ -7,8 +7,8 @@ class World(object):
     def __init__(self, robot, obstacle:list):
         self.robot = robot # 机器人模型
         self.obstacles = obstacle # 包含障碍物的三维坐标，以及半径
-        self.secure_space = 0.02 # 5cm的缓冲区
-        self.robot_radiu = 0.03 # 建模为机械臂关节之间为线段，宽度为10cm
+        self.secure_space = 0.01 # Panda:3cm的缓冲区
+        self.robot_radiu = 0.00 # 建模为机械臂关节之间为线段，Panda宽度为4cm
 
         print("Successfully initialize {} obstales.".format(len(self.obstacles)))
 
@@ -25,10 +25,13 @@ class World(object):
             for i in range(len(li) - 1):
                 for obs in self.obstacles:
                     min_dis = min(min_dis, point_to_segment_distance(obs[:3], li[i], li[i+1]) - obs[3]) # 计算障碍物点到机械臂的最短距离
-            edt[j] = max(self.secure_space + self.robot_radiu - min_dis, 0)
-            if edt[j] > self.secure_space * 0.6:
+            # edt[j] = max(self.secure_space + self.robot_radiu - min_dis, 0)
+            edt[j] = max(self.robot_radiu - min_dis, 0)
+            if edt[j] > self.secure_space:
                 print("Warning: The robot is too close to the obstacle.")
                 edt[j] = edt[j] + 50 # 惩罚项
+            else:
+                edt[j] = 0
         return edt
 
 

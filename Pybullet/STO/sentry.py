@@ -42,7 +42,7 @@ class Sentry():
         self.args = args
 
         self.cost_func.Update_state(init_trajNode.state)
-        init_trajNode.Update_Cost(np.sum(self.cost_func.calculate_total_cost(args.ContourCost)))
+        init_trajNode.Update_Cost(np.sum(self.cost_func.calculate_total_cost(args.ContourCost)[1:]))
         self.pioneer = {"best": deepcopy(init_trajNode), 
                         "voyager": deepcopy(init_trajNode),
                         "neighbour": deepcopy(init_trajNode)}
@@ -59,14 +59,14 @@ class Sentry():
         elif str == 'voyager' or str == 'neighbour':
             self.pioneer[str].Update_traj(new_traj)
             self.cost_func.Update_state(self.pioneer[str].state)
-            self.pioneer[str].Update_Cost(np.sum(self.cost_func.calculate_total_cost(self.args.ContourCost)))
+            self.pioneer[str].Update_Cost(np.sum(self.cost_func.calculate_total_cost(self.args.ContourCost)[1:]))
         elif str == 'clock':
             self.pioneer['neighbour'] = deepcopy(self.pioneer['best'])
     
     def New_turn(self, new_init):
         init_trajNode = TrajNode(new_init, self.args)
         self.cost_func.Update_state(init_trajNode.state)
-        init_trajNode.Update_Cost(np.sum(self.cost_func.calculate_total_cost(self.args.ContourCost)))
+        init_trajNode.Update_Cost(np.sum(self.cost_func.calculate_total_cost(self.args.ContourCost)[1:]))
         self.pioneer = {"best": deepcopy(init_trajNode), 
                         "voyager": deepcopy(init_trajNode),
                         "neighbour": deepcopy(init_trajNode)}

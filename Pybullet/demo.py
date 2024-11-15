@@ -196,7 +196,7 @@ if __name__ == "__main__":
     # STO参数
     parser.add_argument("--Robot", type=str, choices=["Panda", "Z1"], default="Z1") # 选择机器人模型
     parser.add_argument("--dimension", type=int, default=6) # 输入的维数:tips Panda是7，Z1是6
-    parser.add_argument("--iter-num", type=int, default=10) # STO迭代的次数
+    parser.add_argument("--iter-num", type=int, default=20) # STO迭代的次数
     parser.add_argument("--reuse-state", type=bool, default=True) # 是否启用reuse
     parser.add_argument("--K", type=int, default=20) # STO选取的K条轨迹的数量 20
     parser.add_argument("--reuse-num", type=int, default=10) # reuse的数量 10

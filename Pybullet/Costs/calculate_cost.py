@@ -82,7 +82,8 @@ class Multi_Cost():
         # + (1.0 / 3) * dt **3 * acceleration_vector_size * acceleration_vector_size
 
         if self.args.ContourCost:
-            q_s = np.ones(q.shape) * self.calculate_contour_cost(self.args.ContourCost)/max(np.max(q),1) # N * 1
+            q_s = np.ones(q.shape) * self.calculate_contour_cost(self.args.ContourCost)/max(np.max(q),1.0) # N * 1
+            # q_s = np.ones(q.shape) * self.calculate_contour_cost(self.args.ContourCost)
             q = q + q_s
         return q # N * 1
 

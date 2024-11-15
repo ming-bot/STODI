@@ -128,7 +128,7 @@ def main_single_traj(args):
             n7_proved_noise = stomp_py.calculate_delta_noise(weights_p=kn_weights)
 
             # 2.2 get new trajectory
-            temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + (args.decay**iter_num) * 0.5 * n7_proved_noise[1:-1, :] # N * 7
+            temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + (args.decay**iter_num) * n7_proved_noise[1:-1, :] # N * 7
             # temp_iter_traj[1:-1, :] = temp_iter_traj[1:-1, :] + n7_proved_noise[1:-1, :] # N * 7
             # 2.3 limit check
             if stomp_py.multi_limit_check(temp_iter_traj):
@@ -153,7 +153,7 @@ def main_single_traj(args):
     print("Loop is over!")
     Optimization_time = time.time() - begin_time
     print('The total optimization time : {} s.'.format(Optimization_time))
-    print(len(voyager_Qcost_list))
+    # print(len(neighbour_Qcost_list))
 
     if args.STO == 'STODI':
         final_traj_state = generate_multi_state(sentry.pioneer['best'].traj, args)
@@ -470,7 +470,7 @@ if __name__ == "__main__":
     parser.add_argument("--decay", type=float, default=0.8) # decay for better收敛
     parser.add_argument("--STO", type=str, choices=["STODI", "STOMP"], default="STODI") # 是什么随机优化框架
     # loss参数
-    parser.add_argument("--ContourCost", type=str, choices=[None, "DTW", "MSES", "MSEPS", "NMSEPS", "MSE"], default="DTW") # 模仿学习的loss函数指标选择
+    parser.add_argument("--ContourCost", type=str, choices=[None, "DTW", "MSES", "MSEPS", "NMSEPS", "MSE"], default="MSE") # 模仿学习的loss函数指标选择
     parser.add_argument("--ObstacleCost", type=str, choices=[None, "STOMP"], default="STOMP") # 避障的loss
     parser.add_argument("--ConstraintCost", type=str, choices=[None, "STOMP"], default="STOMP") # 约束的loss
     parser.add_argument("--TorqueCost", type=str, choices=[None, "STOMP"], default="STOMP") # 力矩的loss
