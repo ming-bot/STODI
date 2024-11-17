@@ -79,9 +79,9 @@ class RobotArm():
         elif args.ObstacleCost and self.robot_name == 'Z1':
             self.obstacle = []
 
-            bp = [0.2, 0.15, 0.3]
-            obs = p.loadURDF("obstacle/sphere.urdf", basePosition=bp, globalScaling=0.5)
-            self.obstacle.append(copy.copy(bp + [0.04]))
+            # bp = [0.2, 0.15, 0.3]
+            # obs = p.loadURDF("obstacle/sphere.urdf", basePosition=bp, globalScaling=1)
+            # self.obstacle.append(copy.copy(bp + [0.08]))
 
         # example 2：机械臂和小方块、小圆球在桌上
 
@@ -120,7 +120,7 @@ class RobotArm():
         if self.robot_name == 'Panda':
             p.resetDebugVisualizerCamera(cameraDistance=1.5, cameraYaw=120, cameraPitch=-30, cameraTargetPosition=[0, 0, 0.4])
         elif self.robot_name == 'Z1':
-            p.resetDebugVisualizerCamera(cameraDistance=0.7, cameraYaw=30, cameraPitch=-10, cameraTargetPosition=[0, 0, 0.1])
+            p.resetDebugVisualizerCamera(cameraDistance=1.0, cameraYaw=90, cameraPitch=-20, cameraTargetPosition=[0, 0, 0.2])
         
         # logId = p.startStateLogging(p.STATE_LOGGING_VIDEO_MP4, "./video.mp4")
         # p.stopStateLogging(logId)
@@ -133,7 +133,7 @@ class RobotArm():
             # self.target_pos = [0., -0.7, 0.0, -1.6, 0., 3.5, 0.7]  # 末端处于高位
             self.target_pos = [0., 0., 0., -1.6, 0., 1.87, 0.]    # 末端处于低位
         elif self.robot_name == 'Z1':
-            self.target_pos = [-0.3, 0.68, -1.04, 0.18, 0.245, -0.17] # 末端处于高位
+            self.target_pos = [0.005228521470025748, 0.4504296325181785, -0.8985288816139108, 0.48647146872395064, 0.16775067443267064, 0.24798319934352273] # 末端处于中间
 
         for j in range(self.dof):
             self.target_torque[j] = 0.0

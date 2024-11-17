@@ -19,12 +19,12 @@ POSTURE = {'Panda': {'front': [-0.4873441065691155, 0.5814711977864513, 0.923421
            'up': [0.0, -0.7, 0.0, -1.6, 0.0, 3.5, 0.7],
            'right':[-0.3948859155257995, -0.7270775750246515, 0.9705156650028227, -1.7756625474152135, -0.2109975244307001, 2.7461024636268965, 1.071975144388428],
            },
-           'Z1':{'front': [-0.4801968051411831, 2.4705191500590398, -2.2298841544695502, -0.4603309931412034, -0.26550765582356034, -1.7948440075195375],
-           'back':[-0.16095450339344913, 2.03714477446206e-05, -0.1206929181796797, 0.23051021514256406, 0.12173945741366415, -0.29745731880453813],
-           'left': [-1.0224235397243595, 1.57891271955836, -0.9244010364725801, -0.39626622742773004, -0.3769407847833072, 0.26362689271279327],
-           'middle':[-0.30084089082422866, 0.7460330682966394, -0.3125014581909603, -0.3117413872715204, 0.3659345169069073, -1.2592826882667836],
-           'up': [-0.3, 0.68, -1.04, 0.18, 0.245, -0.17],
-           'right':[0.9047114836368709, 1.6134905356772113, -1.1030674545303771, -0.08813445406564796, 0.20095661087100894, 0.6203964876740342],
+           'Z1':{'front': [-0.08810875890124847, 2.192829586859926, -1.7333875430498975, -0.36000533920198435, 0.17326781174833564, -1.9370062281298799],
+           'left': [-0.9266763769103827, 1.7147408172359093, -1.1721008206747938, -0.2879519938608258, 0.23762854665550445, -0.44929498962951486],
+           'middle':[0.005228521470025748, 0.4504296325181785, -0.8985288816139108, 0.48647146872395064, 0.16775067443267064, 0.24798319934352273],
+           'up': [0.0018171402272963246, 1.172799383820571, -1.453885548356379, -0.28382613124306705, 0.10265041464355613, -0.22976814022886144],
+           'right': [0.9116573261152304, 1.4085440983973196, -1.09840056058309, -0.024398221825178104, 0.4507839924308636, -1.1895309425464662],
+           "down": [0.0010549407545234265, 0.26017824292386665, -0.16489775436491044, 0.14232966504401762, 0.041497875686174725, -1.581590191712276]
            }
            }
 
@@ -35,7 +35,7 @@ def demo(args):
     # 1.需要的输入为: Configuration Space的起点和终点; 使用线性插值的手段生成初始轨迹
     begin_inCspace = POSTURE[args.Robot]['up']
     end_inCspace = POSTURE[args.Robot]['front']
-    initial_trajectory = Joint_linear_initial(begin=begin_inCspace, end=end_inCspace)
+    initial_trajectory = Joint_linear_initial(begin=begin_inCspace, end=end_inCspace, N=64)
     '''
     想要模仿的Demonstration
     目前的版本是在Cspace下直接生成轨迹，中间有个中间点进行弯折，比较简单，后期可以留给TODO
@@ -59,7 +59,7 @@ def demo(args):
             acclimit_low_list=np.array([-np.inf,-np.inf,-np.inf,-np.inf,-np.inf,-np.inf,-np.inf]), 
             acclimit_high_list=np.array([np.inf,np.inf,np.inf,np.inf,np.inf,np.inf,np.inf])
             )
-    # 导入Z1相关参数，但尚未调通整体框架
+    # 导入Z1相关参数
     elif args.Robot == 'Z1':
         stomp_py = Multi_dimensions_stomp(
             num_points=initial_trajectory.shape[0], args=args, cost_func=cost_function, 
@@ -204,7 +204,7 @@ if __name__ == "__main__":
     parser.add_argument("--decay", type=float, default=0.9) # decay for better收敛
     parser.add_argument("--STO", type=str, choices=["STODI", "STOMP"], default="STODI") # 是什么随机优化框架
     # loss参数
-    parser.add_argument("--ContourCost", type=str, choices=[None, "DTW", "MSES", "MSEPS", "NMSEPS", "MSE"], default="MSES") # 模仿学习的loss函数指标选择
+    parser.add_argument("--ContourCost", type=str, choices=[None, "DTW", "MSES", "MSEPS", "NMSEPS", "MSE"], default="DTW") # 模仿学习的loss函数指标选择
     parser.add_argument("--ObstacleCost", type=str, choices=[None, "STOMP"], default="STOMP") # 避障的loss
     parser.add_argument("--ConstraintCost", type=str, choices=[None, "STOMP"], default="STOMP") # 约束的loss
     parser.add_argument("--TorqueCost", type=str, choices=[None, "STOMP"], default="STOMP") # 力矩的loss

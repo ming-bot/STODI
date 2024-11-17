@@ -49,9 +49,12 @@ def Draw_3trajectory(init_traj, trajectory, demonstration):
     ax.set_xlabel('X')
     ax.set_xlabel('Y')
     ax.set_xlabel('Z')
+    # ax.set_xlim((-0.2, 0.6))
+    # ax.set_ylim((-0.2, 0.6))
+    # ax.set_zlim((0.5, 1.3))
     ax.set_xlim((-0.2, 0.6))
     ax.set_ylim((-0.2, 0.6))
-    ax.set_zlim((0.5, 1.3))
+    ax.set_zlim((0.1, 0.9))
 
     plt.show()
 
