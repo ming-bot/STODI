@@ -40,6 +40,21 @@ def Generate_demo_demonstration(begin, end, external, dimension=7):
         initial_trajectory[i + points_num, :] = external + (end - external) * float(i)  / (points_num - 1)
     return initial_trajectory
 
+def Generate_multi_demo_demonstration(begin, end, external_list:list, dimension=7):
+    begin = np.array(begin)
+    end = np.array(end)
+    points_num = 128 # per stage
+    initial_trajectory = np.zeros(shape=((len(external_list) + 1) * points_num, dimension))
+    for i in range(points_num):
+        for j in range(len(external_list)):
+            if j == 0:
+                initial_trajectory[i, :] = begin + (np.array(external_list[j]) - begin) * float(i)  / (points_num - 1)
+                initial_trajectory[i + len(external_list) * points_num, :] = np.array(external_list[-1]) + (end - np.array(external_list[-1])) * float(i)  / (points_num - 1)
+            else:
+                initial_trajectory[i + j * points_num, :] = np.array(external_list[j - 1]) + (external_list[j] - np.array(external_list[j - 1])) * float(i)  / (points_num - 1)
+    return initial_trajectory
+
+# Not used
 def Generate_demonstration_from_effector(effector_trajectory, robot):
     effector_trajectory = np.array(effector_trajectory)
     N = effector_trajectory.shape[0]
@@ -62,7 +77,7 @@ def Generate_demonstration_from_effector(effector_trajectory, robot):
 ''' 
 def Generate_effector_trajectory(N, ep, shape, begin, inter, robot):
     temp = np.stack([np.array(begin),np.array(inter)], axis=0)
-    print(temp.shape)
+    # print(temp.shape)
     begin_eff = robot.solveListKinematics(temp)[0,:]
     inter_eff = robot.solveListKinematics(temp)[1,:]
     if shape == 'circle':
@@ -72,7 +87,7 @@ def Generate_effector_trajectory(N, ep, shape, begin, inter, robot):
         y = np.linspace(begin_eff[1], inter_eff[1], N)
         z = np.linspace(begin_eff[2], inter_eff[2], N)
         points_list = np.stack([x,y,z], axis=1)
-        print(points_list.shape)
+        # print(points_list.shape)
 
     trajectory = np.array(points_list)
     noise = np.random.normal(0, ep, size=(N, 3))

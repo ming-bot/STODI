@@ -33,19 +33,21 @@ def demo(args):
     robot = RobotArm(args)
 
     # 1.需要的输入为: Configuration Space的起点和终点; 使用线性插值的手段生成初始轨迹
-    begin_inCspace = POSTURE[args.Robot]['up']
-    end_inCspace = POSTURE[args.Robot]['front']
-    initial_trajectory = Joint_linear_initial(begin=begin_inCspace, end=end_inCspace, N=64)
+    begin_inCspace = np.array([0, 0, -1.04, 0.18, 0.245, -0.17])
+    end_inCspace = np.array([0, 2.00, -1.50, -0.46, -0.27, -1.80])
+    initial_trajectory = Joint_linear_initial(begin=begin_inCspace, end=end_inCspace, N=128)
     '''
     想要模仿的Demonstration
     目前的版本是在Cspace下直接生成轨迹，中间有个中间点进行弯折，比较简单，后期可以留给TODO
     '''
-    external = POSTURE[args.Robot]['right']
-    demostrantion = Generate_demo_demonstration(begin=begin_inCspace, end=end_inCspace, external=external, dimension=args.dimension)
+    external = np.array([-1.02, 1.58, -0.92, -0.40, -0.38, 0.26])
+    demonstration = Generate_demo_demonstration(begin=begin_inCspace, end=end_inCspace, external=external, dimension=args.dimension)
+    # initial_trajectory = Joint_linear_initial(begin=begin_inCspace, end=begin_inCspace, N=384)
+    # demonstration = Generate_multi_demo_demonstration(begin=begin_inCspace, end=begin_inCspace, external_list=[POSTURE[args.Robot]["left"], POSTURE[args.Robot]["right"]], dimension=args.dimension)
 
     init_end_effector = robot.solveListKinematics(initial_trajectory)
     # Cost Function
-    cost_function = Multi_Cost(robot=robot, init_trajectory=demostrantion, args=args)
+    cost_function = Multi_Cost(robot=robot, init_trajectory=demonstration, args=args)
     # Sentry
     sentry = Sentry(initial_trajectory, cost_function, args)
     # 多维Stomp框架，目前这个是Panda的配置
@@ -171,7 +173,7 @@ def demo(args):
     elif args.STO == 'STOMP':
         end_effector = robot.solveListKinematics(sentry.pioneer['voyager'].traj)
     
-    demonstration_eff = robot.solveListKinematics(demostrantion)
+    demonstration_eff = robot.solveListKinematics(demonstration)
     Draw_3trajectory(init_end_effector, end_effector, demonstration_eff)
 
     writing_results = {
@@ -187,6 +189,14 @@ def demo(args):
     
     with open(f"{args.file_path}/demos/{args.expt_name}.json", 'w') as f:
         json.dump(writing_results, f)
+    
+    joints_info = {
+        "position": final_traj_state["position"].tolist(),
+        "velocity": final_traj_state["velocity"].tolist(),
+        "acceleration": final_traj_state["acceleration"].tolist()
+    }
+    with open(f"{args.file_path}/demos/{args.expt_name}_joints.json", 'w') as f:
+        json.dump(joints_info, f)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -212,8 +222,8 @@ if __name__ == "__main__":
     parser.add_argument("--visual-loss", action="store_true")
     parser.add_argument("--visual-traj", action="store_true")
     # 其他参数
-    parser.add_argument("--control-frequency", type=float, default=30) # 假定的控制频率
-    parser.add_argument("--sample-frequency", type=float, default=30) # 假定的采样频率
+    parser.add_argument("--control-frequency", type=float, default=50) # 假定的控制频率
+    parser.add_argument("--sample-frequency", type=float, default=50) # 假定的采样频率
 
     args = parser.parse_args()
 
